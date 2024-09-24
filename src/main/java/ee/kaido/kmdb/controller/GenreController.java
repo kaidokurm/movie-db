@@ -12,6 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/genre/")
 public class GenreController {
+
     @Autowired
     private GenreService genreService;
 
