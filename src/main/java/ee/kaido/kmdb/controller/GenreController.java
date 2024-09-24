@@ -2,7 +2,6 @@ package ee.kaido.kmdb.controller;
 
 import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.service.GenreService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +12,12 @@ import java.util.Map;
 @RequestMapping("/api/genre/")
 public class GenreController {
 
-    @Autowired
-    private GenreService genreService;
+
+    private final GenreService genreService;
+
+    public GenreController(GenreService genreService) {
+        this.genreService = genreService;
+    }
 
     @PostMapping("")
     public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) {
