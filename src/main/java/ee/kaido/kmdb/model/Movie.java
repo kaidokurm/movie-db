@@ -1,4 +1,9 @@
 package ee.kaido.kmdb.model;
+
+import jakarta.persistence.*;
+
+import java.util.Date;
+
 @Entity
 public class Movie {
     @Id

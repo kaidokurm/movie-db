@@ -1,6 +1,10 @@
 package ee.kaido.kmdb.model;
 
-import com.fasterxml.jackson.annotation.JsonTypeId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+
+import java.util.Date;
 
 @Entity
 public class Actor {

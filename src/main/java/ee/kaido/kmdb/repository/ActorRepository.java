@@ -1,4 +1,7 @@
 package ee.kaido.kmdb.repository;
 
-public class ActorRepository extends JpaRepository<Actor,Long>{
+import ee.kaido.kmdb.model.Actor;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ActorRepository extends JpaRepository<Actor, Long> {
 }
