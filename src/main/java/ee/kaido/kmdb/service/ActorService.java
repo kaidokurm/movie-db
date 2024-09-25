@@ -1,7 +1,6 @@
 package ee.kaido.kmdb.service;
 
 import ee.kaido.kmdb.model.Actor;
-import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.repository.ActorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,24 +27,17 @@ public class ActorService {
         return actorRepository.findById(id).orElseThrow(() -> new RuntimeException("No actor found with id: " + id));
     }
 
-    public List<Actor> filterByName(String name) {
-        return actorRepository.findByNameContains(name);
-    }
-
-    public List<Movie> fetchMoviesByActorId(Long id) {
-        Actor actor = actorRepository.findById(id).orElse(null);
-        assert actor != null;
-        return actor.getMovies();
-    }
-
     public Actor updateActor(Long id, Map<String, Object> data) {
+
         Actor actor = getActorById(id);
         data.forEach((key, value) -> {
+
             Field field = ReflectionUtils.findField(Actor.class, key);
             assert field != null;
             field.setAccessible(true);
             ReflectionUtils.setField(field, actor, value);
         });
+
         return actorRepository.save(actor);
     }
 

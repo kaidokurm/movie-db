@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/genre/")
+@RequestMapping("/api/genre")
 public class GenreController {
 
     private final GenreService genreService;
@@ -28,17 +28,17 @@ public class GenreController {
         return ResponseEntity.ok().body(genreService.getAllGenres());
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Genre> getGenreById(@PathVariable long id) {
         return ResponseEntity.ok().body(genreService.getGenreById(id));
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Genre> updateGenre(@PathVariable long id, @RequestBody Map<String, Object> genre) {
         return ResponseEntity.ok().body(genreService.updateGenre(id, genre));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<List<Genre>> deleteGenre(@PathVariable long id) {
         return ResponseEntity.ok().body(genreService.deleteGenre(id));
     }

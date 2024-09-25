@@ -17,12 +17,12 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @PostMapping("movie/")
+    @PostMapping("movie")
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
         return ResponseEntity.ok().body(movieService.addMovie(movie));
     }
 
-    @GetMapping("movie/")
+    @GetMapping("movie")
     public ResponseEntity<List<Movie>> getAllMovies() {
         return ResponseEntity.ok().body(movieService.getAllMovies());
     }
@@ -42,18 +42,12 @@ public class MovieController {
         return ResponseEntity.ok().body(movieService.deleteMovie(id));
     }
 
-    @GetMapping("movies/")
-    public ResponseEntity<List<Movie>> getMoviesByGenre(@RequestParam Long genreId) {
-        return ResponseEntity.ok().body(movieService.getMovieByGenre(genreId));
-    }
-
-    @GetMapping("movies/")
-    public ResponseEntity<List<Movie>> getMoviesByYear(@RequestParam int releaseYear) {
-        return ResponseEntity.ok().body(movieService.getMoviesByYear(releaseYear));
-    }
-
-    @GetMapping("movies/")
-    public ResponseEntity<List<Movie>> getMoviesByActor(@RequestParam Long actorId) {
-        return ResponseEntity.ok().body(movieService.getMoviesByActor(actorId));
+    @GetMapping("movies")
+    public ResponseEntity<List<Movie>> getMoviesByFilter(
+            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer releaseYear,
+            @RequestParam(required = false) Long actorId
+    ) {
+        return ResponseEntity.ok().body(movieService.getMoviesByFilter(genreId, releaseYear, actorId));
     }
 }
