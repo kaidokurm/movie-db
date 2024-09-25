@@ -1,8 +1,6 @@
 package ee.kaido.kmdb.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.List;
@@ -10,6 +8,7 @@ import java.util.List;
 @Entity
 public class Actor {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
     private Date birthDate;

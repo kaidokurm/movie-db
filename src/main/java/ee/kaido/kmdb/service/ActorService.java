@@ -49,7 +49,7 @@ public class ActorService {
         return actorRepository.save(actor);
     }
 
-    public void deleteActor(Actor actor) {
-        actorRepository.delete(actor);
+    public void deleteActor(Long id) {
+        actorRepository.deleteActorById(id);
     }
 }

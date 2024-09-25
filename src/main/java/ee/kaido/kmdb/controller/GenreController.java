@@ -12,7 +12,6 @@ import java.util.Map;
 @RequestMapping("/api/genre/")
 public class GenreController {
 
-
     private final GenreService genreService;
 
     public GenreController(GenreService genreService) {

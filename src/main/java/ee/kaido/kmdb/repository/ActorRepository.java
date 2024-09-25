@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ActorRepository extends JpaRepository<Actor, Long> {
     List<Actor> findByNameContains(String name);
+
+    void deleteActorById(Long id);
 }

@@ -27,8 +27,8 @@ public class MovieService {
         return movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found"));
     }
 
-    public List<Movie> getMovieByGenre(String genre) {
-        return movieRepository.findByGenreName(genre);
+    public List<Movie> getMovieByGenre(Long genre) {
+        return movieRepository.findByGenreId(genre);
     }
 
     public Movie updateMovie(Long id, Map<String, Object> updates) {
@@ -42,7 +42,16 @@ public class MovieService {
         return movieRepository.save(movie);
     }
 
-    public void deleteMovie(Long id) {
+    public List<Movie> getMoviesByActor(Long actor) {
+        return movieRepository.findByActorId(actor);
+    }
+
+    public List<Movie> deleteMovie(Long id) {
         movieRepository.deleteById(id);
+        return getAllMovies();
+    }
+
+    public List<Movie> getMoviesByYear(int releaseYear) {
+        return movieRepository.findByReleasedYear(releaseYear);
     }
 }
