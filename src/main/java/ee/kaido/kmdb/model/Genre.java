@@ -1,17 +1,20 @@
 package ee.kaido.kmdb.model;
 
-import jakarta.persistence.*;
-
-import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Genre {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
+    @Size(min = 1)
     private String name;
-    @OneToMany
-    private List<Movie> movie;
 
     public Long getId() {
         return id;
@@ -27,13 +30,5 @@ public class Genre {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Movie> getMovie() {
-        return movie;
-    }
-
-    public void setMovie(List<Movie> movie) {
-        this.movie = movie;
     }
 }

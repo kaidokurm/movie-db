@@ -9,6 +9,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class ActorService {
@@ -24,7 +25,7 @@ public class ActorService {
     }
 
     public Actor getActorById(long id) {
-        return actorRepository.findById(id).orElseThrow(() -> new RuntimeException("No actor found with id: " + id));
+        return actorRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No actor found with id: " + id));
     }
 
     public Actor updateActor(Long id, Map<String, Object> data) {

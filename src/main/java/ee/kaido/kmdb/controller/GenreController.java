@@ -1,5 +1,6 @@
 package ee.kaido.kmdb.controller;
 
+import ee.kaido.kmdb.controller.exception.ElementExistsException;
 import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.service.GenreService;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class GenreController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) {
+    public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) throws ElementExistsException {
         return ResponseEntity.ok().body(genreService.addGenre(genre));
     }
 

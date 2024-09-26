@@ -1,6 +1,7 @@
 package ee.kaido.kmdb.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -8,8 +9,9 @@ import java.util.List;
 @Entity
 public class Actor {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String name;
     private Date birthDate;
     @ManyToMany

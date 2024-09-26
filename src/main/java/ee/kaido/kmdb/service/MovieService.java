@@ -8,6 +8,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +29,7 @@ public class MovieService {
     }
 
     public Movie getMovieById(Long id) {
-        return movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found"));
+        return movieRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No movie found with id: " + id));
     }
 
     public Movie updateMovie(Long id, Map<String, Object> updates) {
