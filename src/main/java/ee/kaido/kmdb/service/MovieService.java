@@ -1,14 +1,15 @@
 package ee.kaido.kmdb.service;
 
+import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.repository.MovieRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,7 +21,13 @@ public class MovieService {
         this.movieRepository = movieRepository;
     }
 
-    public Movie addMovie(Movie movie) {
+    public Movie addMovie(@Valid Movie movie) {
+        System.out.println("How");
+        if (movie.getTitle() == null || movie.getTitle().trim().isEmpty()) {
+            System.out.println("Title is empty");
+            throw new IllegalArgumentException("Movie must have a title");
+        }
+        System.out.println("Far");
         return movieRepository.save(movie);
     }
 
@@ -28,11 +35,11 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    public Movie getMovieById(Long id) {
-        return movieRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No movie found with id: " + id));
+    public Movie getMovieById(Long id) throws ResourceNotFoundException {
+        return movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id));
     }
 
-    public Movie updateMovie(Long id, Map<String, Object> updates) {
+    public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
         Movie movie = getMovieById(id);
         updates.forEach((key, value) -> {
             Field field = ReflectionUtils.findField(Movie.class, key);

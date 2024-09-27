@@ -1,7 +1,10 @@
 package ee.kaido.kmdb.controller;
 
+import ee.kaido.kmdb.controller.exception.ElementExistsException;
+import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Actor;
 import ee.kaido.kmdb.service.ActorService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +21,8 @@ public class ActorController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Actor> createActor(@RequestBody Actor actor) {
-        return ResponseEntity.ok().body(actorService.addActor(actor));
+    public ResponseEntity<Actor> createActor(@RequestBody Actor actor) throws ElementExistsException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.addActor(actor));
     }
 
     @GetMapping("")
@@ -28,18 +31,17 @@ public class ActorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Actor> getActorById(@PathVariable int id) {
+    public ResponseEntity<Actor> getActorById(@PathVariable int id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(actorService.getActorById(id));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Actor> updateActor(@PathVariable long id, @RequestBody Map<String, Object> data) {
-        return ResponseEntity.ok().body(actorService.updateActor(id, data));
+    public ResponseEntity<Actor> updateActor(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.updateActor(id, data));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteActor(@PathVariable long id) {
-        actorService.deleteActor(id);
-        return ResponseEntity.ok("Actor with id " + id + " deleted.");
+    public ResponseEntity<List<Actor>> deleteActor(@PathVariable long id) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.deleteActor(id));
     }
 }

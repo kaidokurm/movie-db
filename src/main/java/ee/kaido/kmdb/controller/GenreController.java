@@ -1,14 +1,18 @@
 package ee.kaido.kmdb.controller;
 
 import ee.kaido.kmdb.controller.exception.ElementExistsException;
+import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.service.GenreService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@Validated
 @RestController
 @RequestMapping("/api/genre")
 public class GenreController {
@@ -21,7 +25,7 @@ public class GenreController {
 
     @PostMapping("")
     public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) throws ElementExistsException {
-        return ResponseEntity.ok().body(genreService.addGenre(genre));
+        return ResponseEntity.status(HttpStatus.CREATED).body(genreService.addGenre(genre));
     }
 
     @GetMapping("")
@@ -30,17 +34,17 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Genre> getGenreById(@PathVariable long id) {
+    public ResponseEntity<Genre> getGenreById(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(genreService.getGenreById(id));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Genre> updateGenre(@PathVariable long id, @RequestBody Map<String, Object> genre) {
-        return ResponseEntity.ok().body(genreService.updateGenre(id, genre));
+    public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody Map<String, Object> genre) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(genreService.updateGenre(id, genre));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<Genre>> deleteGenre(@PathVariable long id) {
-        return ResponseEntity.ok().body(genreService.deleteGenre(id));
+    public ResponseEntity<List<Genre>> deleteGenre(@PathVariable long id) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(genreService.deleteGenre(id));
     }
 }
