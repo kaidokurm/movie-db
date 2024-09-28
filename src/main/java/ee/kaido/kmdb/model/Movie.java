@@ -1,11 +1,13 @@
 package ee.kaido.kmdb.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.Duration;
 import java.util.List;
 
 @Getter
@@ -18,7 +20,8 @@ public class Movie {
     @NonNull
     private String title;
     private int releasedYear;
-    private Date duration;
+    @JsonDeserialize(using = DurationDeserializer.class)
+    private Duration duration;
     @ManyToOne
     @JoinColumn(name = "genre_id")
     private Genre genre;

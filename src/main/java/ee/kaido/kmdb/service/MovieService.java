@@ -1,33 +1,42 @@
 package ee.kaido.kmdb.service;
 
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
+import ee.kaido.kmdb.model.Actor;
 import ee.kaido.kmdb.model.Movie;
+import ee.kaido.kmdb.repository.ActorRepository;
+import ee.kaido.kmdb.repository.GenreRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
 
     private final MovieRepository movieRepository;
+    private final ActorRepository actorRepository;
+    private final GenreRepository genreRepository;
 
-    public MovieService(MovieRepository movieRepository) {
+    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository) {
         this.movieRepository = movieRepository;
+        this.actorRepository = actorRepository;
+        this.genreRepository = genreRepository;
     }
 
     public Movie addMovie(@Valid Movie movie) {
-        System.out.println("How");
-        if (movie.getTitle() == null || movie.getTitle().trim().isEmpty()) {
-            System.out.println("Title is empty");
+        //without optional cant trim if title=null
+        if (!Optional.ofNullable(movie.getTitle()).map(String::trim).filter(s -> !s.isEmpty()).isPresent()) {
             throw new IllegalArgumentException("Movie must have a title");
         }
-        System.out.println("Far");
+        //find all actors bi id
+        List<Actor> actors = actorRepository.findAllById(movie.getActor().stream().map(Actor::getId).collect(Collectors.toList()));
+        movie.setActor(actors);
         return movieRepository.save(movie);
     }
 
@@ -39,14 +48,34 @@ public class MovieService {
         return movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id));
     }
 
-    public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
+    public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException, IOException {
         Movie movie = getMovieById(id);
-        updates.forEach((key, value) -> {
-            Field field = ReflectionUtils.findField(Movie.class, key);
-            assert field != null;
-            field.setAccessible(true);
-            ReflectionUtils.setField(field, movie, value);
-        });
+
+        if (updates.containsKey("title")) {
+            movie.setTitle((String) updates.get("title"));
+        }
+
+        if (updates.containsKey("releasedYear")) {
+            movie.setReleasedYear((Integer) updates.get("releasedYear"));
+        }
+
+        if (updates.containsKey("duration")) {
+            movie.setDuration(Duration.parse((String) updates.get("duration")));
+        }
+
+        if (updates.containsKey("genre")) {
+            Long genreId = (Long) updates.get("genre");
+            movie.setGenre(genreRepository.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("No genre found with id: " + genreId)));
+        }
+
+        if (updates.containsKey("actor")) {
+            
+            List<Long> actorId = ((List<Map<String, Object>>) updates.get("actor")).stream()
+                    .map(actor -> (Long) actor.get("id"))
+                    .collect(Collectors.toList());
+            movie.setActor(actorRepository.findAllById(actorId));
+        }
+
         return movieRepository.save(movie);
     }
 
