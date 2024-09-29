@@ -2,6 +2,7 @@ package ee.kaido.kmdb.service;
 
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Actor;
+import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.GenreRepository;
@@ -9,8 +10,8 @@ import ee.kaido.kmdb.repository.MovieRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,14 +31,26 @@ public class MovieService {
     }
 
     public Movie addMovie(@Valid Movie movie) {
+
+        validateMovieTitle(movie);
+        validateMovieActorsAndGenres(movie);
+        return movieRepository.save(movie);
+    }
+
+    private void validateMovieTitle(Movie movie) {
         //without optional cant trim if title=null
         if (!Optional.ofNullable(movie.getTitle()).map(String::trim).filter(s -> !s.isEmpty()).isPresent()) {
             throw new IllegalArgumentException("Movie must have a title");
         }
-        //find all actors bi id
-        List<Actor> actors = actorRepository.findAllById(movie.getActor().stream().map(Actor::getId).collect(Collectors.toList()));
-        movie.setActor(actors);
-        return movieRepository.save(movie);
+    }
+
+    private void validateMovieActorsAndGenres(Movie movie) {
+        //find all actors by id
+        List<Actor> actors = actorRepository.findAllById(movie.getActors().stream().map(Actor::getId).collect(Collectors.toList()));
+        movie.setActors(actors);
+        //find all genres by id
+        List<Genre> genres = genreRepository.findAllById(movie.getGenres().stream().map(Genre::getId).collect(Collectors.toList()));
+        movie.setGenres(genres);
     }
 
     public List<Movie> getAllMovies() {
@@ -48,7 +61,7 @@ public class MovieService {
         return movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id));
     }
 
-    public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException, IOException {
+    public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
         Movie movie = getMovieById(id);
 
         if (updates.containsKey("title")) {
@@ -63,17 +76,26 @@ public class MovieService {
             movie.setDuration(Duration.parse((String) updates.get("duration")));
         }
 
-        if (updates.containsKey("genre")) {
-            Long genreId = (Long) updates.get("genre");
-            movie.setGenre(genreRepository.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("No genre found with id: " + genreId)));
+        if (updates.containsKey("genres")) {
+            List<Long> genresIds = ((List<Map<String, Object>>) updates.get("genres")).stream()
+                    .map(genre -> (Long) genre.get("id"))
+                    .toList();
+            List<Genre> genres = new ArrayList<>();
+            for (Long genreId : genresIds) {
+                genres.add(genreRepository.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("No genre found with id: " + genreId)));
+            }
+            movie.setGenres(genres);
         }
 
-        if (updates.containsKey("actor")) {
-            
-            List<Long> actorId = ((List<Map<String, Object>>) updates.get("actor")).stream()
+        if (updates.containsKey("actors")) {
+            List<Long> actorIds = ((List<Map<String, Object>>) updates.get("actors")).stream()
                     .map(actor -> (Long) actor.get("id"))
-                    .collect(Collectors.toList());
-            movie.setActor(actorRepository.findAllById(actorId));
+                    .toList();
+            List<Actor> actors = new ArrayList<>();
+            for (Long actorId : actorIds) {
+                actors.add(actorRepository.findById(actorId).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + actorId)));
+            }
+            movie.setActors(actors);
         }
 
         return movieRepository.save(movie);
@@ -87,25 +109,42 @@ public class MovieService {
     public List<Movie> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId) {
         List<Movie> movies = getAllMovies();
 
-        if (genreId != null) {
-            movies = movies.stream()
-                    .filter(movie -> movie.getGenre().getId().equals(genreId))
-                    .collect(Collectors.toList());
-        }
+        movies = filterByGenre(genreId, movies);
+        movies = filterByReleaseYear(releaseYear, movies);
+        movies = filterByActor(actorId, movies);
 
+        return movies;
+    }
+
+    private List<Movie> filterByGenre(Long genreId, List<Movie> movies) {
+        if (genreId != null) {
+            Optional<Genre> optionalGenre = genreRepository.findById(genreId);
+            if (optionalGenre.isPresent()) {
+                Genre genre = optionalGenre.get();
+                movies = movies.stream()
+                        .filter(movie -> movie.getGenres().contains(genre))
+                        .collect(Collectors.toList());
+            }
+        }
+        return movies;
+    }
+
+    private List<Movie> filterByReleaseYear(Integer releaseYear, List<Movie> movies) {
         if (releaseYear != null) {
             movies = movies.stream()
                     .filter(movie -> movie.getReleasedYear() == releaseYear)
                     .collect(Collectors.toList());
         }
+        return movies;
+    }
 
+    private List<Movie> filterByActor(Long actorId, List<Movie> movies) {
         if (actorId != null) {
             movies = movies.stream()
-                    .filter(movie -> movie.getActor().stream()
+                    .filter(movie -> movie.getActors().stream()
                             .anyMatch(actor -> actor.getId().equals(actorId)))
                     .collect(Collectors.toList());
         }
-
         return movies;
     }
 }

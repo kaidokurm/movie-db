@@ -6,13 +6,10 @@ import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.annotation.Validated;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Validated
@@ -21,13 +18,17 @@ public class GenreService {
     private GenreRepository genreRepository;
 
     public Genre addGenre(Genre genre) throws ElementExistsException {
+        validateGenre(genre);
+        return genreRepository.save(genre);
+    }
+
+    private void validateGenre(Genre genre) throws ElementExistsException {
         if (genre.getId() != null && genreRepository.findById(genre.getId()).isPresent())
             throw new ElementExistsException("Genre with id " + genre.getId() + " already exists");
         if (genre.getName().trim().isEmpty())
             throw new IllegalArgumentException("Genre name can't be empty!");
         if (genreRepository.findByName(genre.getName()) != null)
             throw new ElementExistsException("Genre with name " + genre.getName() + " already exists");
-        return genreRepository.save(genre);
     }
 
     public List<Genre> getAllGenres() {
@@ -40,15 +41,17 @@ public class GenreService {
 
     public Genre updateGenre(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
         Genre genre = getGenreById(id);
-        updates.forEach((key, value) -> {
-            if (Objects.equals(key, "name") && (value == null || value == ""))
-                throw new IllegalArgumentException("Name cannot be empty");
-            Field field = ReflectionUtils.findField(Genre.class, key);
-            assert field != null;
-            field.setAccessible(true);
-            ReflectionUtils.setField(field, genre, value);
-        });
+        updateGenreName(updates, genre);
         return genreRepository.save(genre);
+    }
+
+    private static void updateGenreName(Map<String, Object> updates, Genre genre) {
+        if (updates.containsKey("name")) {
+            String newName = (String) updates.get("name");
+            if (newName == null || newName.trim().isEmpty())
+                throw new IllegalArgumentException("Genre name can't be empty!");
+            genre.setName(newName);
+        }
     }
 
     public List<Genre> deleteGenre(Long id) throws ResourceNotFoundException {
