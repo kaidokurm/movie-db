@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/actor")
+@RequestMapping("/api/")
 public class ActorController {
     private final ActorService actorService;
 
@@ -20,28 +20,33 @@ public class ActorController {
         this.actorService = actorService;
     }
 
-    @PostMapping("")
-    public ResponseEntity<Actor> createActor(@RequestBody Actor actor) throws ElementExistsException {
+    @PostMapping("actor")
+    public ResponseEntity<Actor> createActor(@RequestBody Actor actor) throws ElementExistsException, ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(actorService.addActor(actor));
     }
 
-    @GetMapping("")
+    @GetMapping("actor")
     public ResponseEntity<List<Actor>> getActors() {
         return ResponseEntity.ok().body(actorService.getAllActors());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("actor/{id}")
     public ResponseEntity<Actor> getActorById(@PathVariable int id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(actorService.getActorById(id));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("actor/{id}")
     public ResponseEntity<Actor> updateActor(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.updateActor(id, data));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("actor/{id}")
     public ResponseEntity<List<Actor>> deleteActor(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.deleteActor(id));
+    }
+
+    @GetMapping("actors")
+    public ResponseEntity<List<Actor>> getActorsByName(@RequestParam String name) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(actorService.findActorsByName(name));
     }
 }

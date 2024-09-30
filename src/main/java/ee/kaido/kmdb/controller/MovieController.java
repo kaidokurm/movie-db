@@ -31,7 +31,7 @@ public class MovieController {
 
     @GetMapping("movie/{id}")
     public ResponseEntity<Movie> getMovie(@PathVariable long id) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.getMovieById(id));
+        return ResponseEntity.ok().body(movieService.findMovieById(id));
     }
 
     @PatchMapping("movie/{id}")
@@ -49,7 +49,7 @@ public class MovieController {
             @RequestParam(required = false) Long genreId,
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) Long actorId
-    ) {
+    ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(movieService.getMoviesByFilter(genreId, releaseYear, actorId));
     }
 }

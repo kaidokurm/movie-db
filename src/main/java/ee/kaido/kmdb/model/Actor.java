@@ -19,6 +19,6 @@ public class Actor {
     @NonNull
     private String name;
     private Date birthDate;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Movie> movies;
 }

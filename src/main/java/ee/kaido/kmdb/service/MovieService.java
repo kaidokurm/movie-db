@@ -14,7 +14,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,11 +22,13 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final ActorRepository actorRepository;
     private final GenreRepository genreRepository;
+    private final GenreService genreService;
 
-    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository) {
+    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository, GenreService genreService) {
         this.movieRepository = movieRepository;
         this.actorRepository = actorRepository;
         this.genreRepository = genreRepository;
+        this.genreService = genreService;
     }
 
     public Movie addMovie(@Valid Movie movie) {
@@ -38,9 +39,8 @@ public class MovieService {
     }
 
     private void validateMovieTitle(Movie movie) {
-        //without optional cant trim if title=null
-        if (!Optional.ofNullable(movie.getTitle()).map(String::trim).filter(s -> !s.isEmpty()).isPresent()) {
-            throw new IllegalArgumentException("Movie must have a title");
+        if (movie.getTitle().equals(null) || movie.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Movie title cannot be empty");
         }
     }
 
@@ -57,12 +57,12 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    public Movie getMovieById(Long id) throws ResourceNotFoundException {
+    public Movie findMovieById(Long id) throws ResourceNotFoundException {
         return movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id));
     }
 
     public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
-        Movie movie = getMovieById(id);
+        Movie movie = findMovieById(id);
 
         if (updates.containsKey("title")) {
             movie.setTitle((String) updates.get("title"));
@@ -106,7 +106,7 @@ public class MovieService {
         return getAllMovies();
     }
 
-    public List<Movie> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId) {
+    public List<Movie> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId) throws ResourceNotFoundException {
         List<Movie> movies = getAllMovies();
 
         movies = filterByGenre(genreId, movies);
@@ -116,15 +116,10 @@ public class MovieService {
         return movies;
     }
 
-    private List<Movie> filterByGenre(Long genreId, List<Movie> movies) {
+    private List<Movie> filterByGenre(Long genreId, List<Movie> movies) throws ResourceNotFoundException {
         if (genreId != null) {
-            Optional<Genre> optionalGenre = genreRepository.findById(genreId);
-            if (optionalGenre.isPresent()) {
-                Genre genre = optionalGenre.get();
-                movies = movies.stream()
-                        .filter(movie -> movie.getGenres().contains(genre))
-                        .collect(Collectors.toList());
-            }
+            Genre genre = genreService.getGenreById(genreId);
+            return movieRepository.findMoviesByGenreId(genre.getId());
         }
         return movies;
     }
