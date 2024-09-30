@@ -1,6 +1,7 @@
 package ee.kaido.kmdb.controller;
 
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
+import ee.kaido.kmdb.model.Actor;
 import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.service.MovieService;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,12 @@ public class MovieController {
             @RequestParam(required = false) Long genreId,
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) Long actorId
-    ) throws ResourceNotFoundException {
+    ) {
         return ResponseEntity.ok().body(movieService.getMoviesByFilter(genreId, releaseYear, actorId));
+    }
+
+    @GetMapping("movies/{movieId}/actors")
+    public ResponseEntity<List<Actor>> getActorsByMovie(@PathVariable long movieId) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(movieService.getActorsInMovie(movieId));
     }
 }

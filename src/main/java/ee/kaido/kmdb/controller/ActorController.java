@@ -1,5 +1,6 @@
 package ee.kaido.kmdb.controller;
 
+import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ElementExistsException;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Actor;
@@ -21,8 +22,8 @@ public class ActorController {
     }
 
     @PostMapping("actor")
-    public ResponseEntity<Actor> createActor(@RequestBody Actor actor) throws ElementExistsException, ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.addActor(actor));
+    public ResponseEntity<Actor> createActor(@RequestBody Map<String, Object> data) throws ElementExistsException, ResourceNotFoundException, BadRequestException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.addActor(data));
     }
 
     @GetMapping("actor")
@@ -36,7 +37,7 @@ public class ActorController {
     }
 
     @PatchMapping("actor/{id}")
-    public ResponseEntity<Actor> updateActor(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException {
+    public ResponseEntity<Actor> updateActor(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.updateActor(id, data));
     }
 
@@ -46,7 +47,7 @@ public class ActorController {
     }
 
     @GetMapping("actors")
-    public ResponseEntity<List<Actor>> getActorsByName(@RequestParam String name) throws ResourceNotFoundException {
+    public ResponseEntity<List<Actor>> getActorsByName(@RequestParam String name) {
         return ResponseEntity.ok().body(actorService.findActorsByName(name));
     }
 }

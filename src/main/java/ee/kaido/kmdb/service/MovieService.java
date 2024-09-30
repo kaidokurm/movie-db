@@ -22,13 +22,11 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final ActorRepository actorRepository;
     private final GenreRepository genreRepository;
-    private final GenreService genreService;
 
-    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository, GenreService genreService) {
+    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository) {
         this.movieRepository = movieRepository;
         this.actorRepository = actorRepository;
         this.genreRepository = genreRepository;
-        this.genreService = genreService;
     }
 
     public Movie addMovie(@Valid Movie movie) {
@@ -106,21 +104,14 @@ public class MovieService {
         return getAllMovies();
     }
 
-    public List<Movie> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId) throws ResourceNotFoundException {
+    public List<Movie> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId) {
         List<Movie> movies = getAllMovies();
-
-        movies = filterByGenre(genreId, movies);
+        if (genreId != null) {
+            movies = movieRepository.findMoviesByGenreId(genreId);
+        }
         movies = filterByReleaseYear(releaseYear, movies);
         movies = filterByActor(actorId, movies);
 
-        return movies;
-    }
-
-    private List<Movie> filterByGenre(Long genreId, List<Movie> movies) throws ResourceNotFoundException {
-        if (genreId != null) {
-            Genre genre = genreService.getGenreById(genreId);
-            return movieRepository.findMoviesByGenreId(genre.getId());
-        }
         return movies;
     }
 
@@ -141,5 +132,13 @@ public class MovieService {
                     .collect(Collectors.toList());
         }
         return movies;
+    }
+
+    public List<Actor> getActorsInMovie(Long movieId) throws ResourceNotFoundException {
+        try {
+            return findMovieById(movieId).getActors();
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("No actors found");
+        }
     }
 }

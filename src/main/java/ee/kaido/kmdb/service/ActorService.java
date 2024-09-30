@@ -2,6 +2,7 @@ package ee.kaido.kmdb.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ElementExistsException;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Actor;
@@ -9,9 +10,7 @@ import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.repository.ActorRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -33,14 +32,14 @@ public class ActorService {
         this.movieService = movieService;
     }
 
-    public Actor addActor(Actor actor) throws ElementExistsException, ResourceNotFoundException {
-        checkIfActorIdExists(actor.getId());
-        checkActorName(actor.getName());
-        checkActorBirthDate(actor.getBirthDate());
-        checkActorMovies(actor);
+    public Actor addActor(Map<String, Object> data) throws ElementExistsException, ResourceNotFoundException, BadRequestException {
+        JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
+        if (jsonNode.has("id"))
+            checkIfActorIdExists(jsonNode.get("id").asLong());
+        Actor actor = new Actor();
+        updateActorFields(jsonNode, actor);
         return actorRepository.save(actor);
     }
-
 
     private void checkIfActorIdExists(Long id) throws ElementExistsException {
         if (id != null && actorRepository.findById(id).isPresent())
@@ -52,17 +51,17 @@ public class ActorService {
             throw new IllegalArgumentException("Actor name can't be empty!");
     }
 
-    private void checkActorBirthDate(Date birthDate) {
+    private static Date checkActorBirthDate(String birthDate) throws BadRequestException {
         if (birthDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
             try {
-                Instant instant = birthDate.toInstant();
-                LocalDate localDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                formatter.parse(localDate.toString());
+                LocalDate localDate = LocalDate.parse(birthDate, formatter);
+                return Date.from(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
             } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException(birthDate + " is not a valid date format 'yyyy-MM-dd'");
+                throw new BadRequestException(birthDate + " is not a valid date format 'yyyy-MM-dd'");
             }
         }
+        return null;
     }
 
     private void checkActorMovies(Actor actor) throws ResourceNotFoundException {
@@ -83,23 +82,23 @@ public class ActorService {
         return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
     }
 
-    public Actor updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException {
+    public Actor updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
         Actor actor = getActorById(id);
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
         updateActorFields(jsonNode, actor);
         return actorRepository.save(actor);
     }
 
-    private void updateActorFields(JsonNode jsonNode, Actor actor) throws ResourceNotFoundException {
+    private void updateActorFields(JsonNode jsonNode, Actor actor) throws ResourceNotFoundException, BadRequestException {
         if (jsonNode.has("name")) {
             String name = jsonNode.get("name").asText();
             checkActorName(name);
             actor.setName(name);
         }
         if (jsonNode.has("birthDate")) {
-            Date birthDate = mapper.convertValue(jsonNode.get("birthDate"), Date.class);
-            checkActorBirthDate(birthDate);
-            actor.setBirthDate(birthDate);
+            String birthDateString = jsonNode.get("birthDate").asText();
+            Date date = checkActorBirthDate(birthDateString);
+            actor.setBirthDate(date);
         }
         if (jsonNode.has("movies")) {
             List<Movie> movies = new ArrayList<>();
