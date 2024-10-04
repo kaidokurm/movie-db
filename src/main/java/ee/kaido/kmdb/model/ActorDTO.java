@@ -20,32 +20,6 @@ public class ActorDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<MovieDTO> movies;
 
-    public ActorDTO(Long id, String name, Date birthDate) {
-        this.id = id;
-        this.name = name;
-        this.birthDate = birthDate;
-    }
-
-    public ActorDTO(Long id, String name, Date birthDate, List<MovieDTO> movies) {
-        this.id = id;
-        this.name = name;
-        this.birthDate = birthDate;
-        this.movies = movies;
-    }
-
-    public ActorDTO(Actor actor) {
-        this.id = actor.getId();
-        this.name = actor.getName();
-        this.birthDate = actor.getBirthDate();
-        if (actor.getMovies() != null) {
-            List<MovieDTO> movieDTOS = new ArrayList<>();
-            for (Movie movie : actor.getMovies()) {
-                movieDTOS.add(new MovieDTO(movie));
-            }
-            this.movies = movieDTOS;
-        }
-    }
-
     public ActorDTO(Actor actor, boolean showMovies) {
         this.id = actor.getId();
         this.name = actor.getName();
@@ -53,7 +27,7 @@ public class ActorDTO {
         if (showMovies && actor.getMovies() != null) {
             List<MovieDTO> movieDTOS = new ArrayList<>();
             for (Movie movie : actor.getMovies()) {
-                movieDTOS.add(new MovieDTO(movie));
+                movieDTOS.add(new MovieDTO(movie, false));
             }
             this.movies = movieDTOS;
         }

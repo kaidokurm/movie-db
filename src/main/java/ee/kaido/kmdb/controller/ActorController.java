@@ -26,9 +26,9 @@ public class ActorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(actorService.addActor(data));
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<ActorDTO>> getActors() {
-        return ResponseEntity.ok().body(actorService.getActorsWithMovies());
+    @GetMapping({"", "/find"})
+    public ResponseEntity<List<ActorDTO>> getActorsByFilter(@RequestParam(required = false) String name) {
+        return ResponseEntity.ok().body(actorService.getActorsByFilter(name));
     }
 
 
@@ -45,10 +45,5 @@ public class ActorController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteActor(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.deleteActor(id));
-    }
-
-    @GetMapping("/find")
-    public ResponseEntity<List<ActorDTO>> getActorsByName(@RequestParam String name) {
-        return ResponseEntity.ok().body(actorService.findActorsByName(name));
     }
 }

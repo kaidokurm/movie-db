@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ActorRepository extends JpaRepository<Actor, Long> {
-    @Query("SELECT a FROM Actor a  WHERE LOWER( a.name) LIKE %:name%")
+    @Query("SELECT a FROM Actor a  " +
+            "WHERE (:name IS NULL OR LOWER( a.name) LIKE %:name%)")
     List<Actor> findByNameContains(@Param("name") String name);
 }

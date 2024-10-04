@@ -24,13 +24,13 @@ public class GenreController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) throws ElementExistsException {
+    public ResponseEntity<Genre> createGenre(@RequestBody Genre genre) throws ElementExistsException {
         return ResponseEntity.status(HttpStatus.CREATED).body(genreService.addGenre(genre));
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Genre>> getAllGenres() {
-        return ResponseEntity.ok().body(genreService.getAllGenres());
+    public ResponseEntity<List<Genre>> getAllGenres(@RequestParam(required = false) String name) {
+        return ResponseEntity.ok().body(genreService.getAllGenresByName(name));
     }
 
     @GetMapping("/{id}")

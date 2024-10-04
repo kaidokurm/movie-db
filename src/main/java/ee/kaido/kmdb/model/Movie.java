@@ -27,8 +27,8 @@ public class Movie {
     private int releasedYear;
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
-    @ManyToMany(cascade = {CascadeType.PERSIST,
-            CascadeType.MERGE}, fetch = FetchType.LAZY)
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),

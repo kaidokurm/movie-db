@@ -13,13 +13,11 @@ import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ee.kaido.kmdb.service.checkers.Checks.checkIfStringNotEmpty;
-import static ee.kaido.kmdb.service.checkers.Checks.checkIsIsoDate;
 
 @Service
 public class ActorService {
@@ -41,17 +39,33 @@ public class ActorService {
         Actor actor = new Actor();
         updateActorFields(jsonNode, actor);
         Actor savedActor = actorRepository.save(actor);
-
-        return new ActorDTO(savedActor);
+        return new ActorDTO(savedActor, true);
     }
 
-    public List<ActorDTO> getActorsWithMovies() {
-        List<Actor> actors = actorRepository.findAll();
-        List<ActorDTO> actorDTOs = new ArrayList<>();
-        for (Actor actor : actors) {
-            actorDTOs.add(new ActorDTO(actor));
-        }
-        return actorDTOs;
+    public List<ActorDTO> getActorsByFilter(String name) {
+        return actorRepository.findByNameContains(name).stream().map(actor -> new ActorDTO(actor, true)).collect(Collectors.toList());
+    }
+
+    public ActorDTO findActorDtoById(long id) throws ResourceNotFoundException {
+        return new ActorDTO(actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id)), true);
+    }
+
+    public Actor getActorById(long id) throws ResourceNotFoundException {
+        return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
+    }
+
+    public ActorDTO updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
+        Actor actor = actorRepository.getOne()getActorById(id);
+        JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
+        updateActorFields(jsonNode, actor);
+        Actor savedActor = actorRepository.updateActor(actor).save(actor);
+        return new ActorDTO(savedActor, true);
+    }
+
+    public String deleteActor(Long id) throws ResourceNotFoundException {
+        this.getActorById(id);
+        actorRepository.deleteById(id);
+        return "Actor with id " + id + " was deleted";
     }
 
     private void checkIfActorIdExists(Long id) throws ElementExistsException {
@@ -59,32 +73,14 @@ public class ActorService {
             throw new ElementExistsException("Actor with id " + id + " already exists");
     }
 
-    public ActorDTO findActorDtoById(long id) throws ResourceNotFoundException {
-        return new ActorDTO(actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id)));
-    }
-
-    public Actor findActorById(long id) throws ResourceNotFoundException {
-        return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
-    }
-
-    public ActorDTO updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
-        Actor actor = findActorById(id);
-        JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
-        updateActorFields(jsonNode, actor);
-        Actor savedActor = actorRepository.save(actor);
-        return new ActorDTO(savedActor);
-    }
-
     private void updateActorFields(JsonNode jsonNode, Actor actor) throws BadRequestException, ResourceNotFoundException {
         if (jsonNode.has("name")) {
-            String name = jsonNode.get("name").asText();
-            checkIfStringNotEmpty(name, "Actor name");
-            actor.setName(name);
+            actor.setName(
+                    checkIfStringNotEmpty(jsonNode.get("name").asText(), "Actor name")
+            );
         }
         if (jsonNode.has("birthDate")) {
-            String birthDateString = jsonNode.get("birthDate").asText();
-            Date date = checkIsIsoDate(birthDateString);
-            actor.setBirthDate(birthDateString);
+            actor.setBirthDate(jsonNode.get("birthDate").asText());
         }
         if (jsonNode.has("movies")) {
             List<Movie> movies = new ArrayList<>();
@@ -95,15 +91,5 @@ public class ActorService {
             }
             actor.setMovies(movies);
         }
-    }
-
-    public String deleteActor(Long id) throws ResourceNotFoundException {
-        this.findActorById(id);
-        actorRepository.deleteById(id);
-        return "Actor with id " + id + " was deleted";
-    }
-
-    public List<ActorDTO> findActorsByName(String name) {
-        return actorRepository.findByNameContains(name).stream().map(ActorDTO::new).collect(Collectors.toList());
     }
 }

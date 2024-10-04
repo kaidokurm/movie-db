@@ -32,8 +32,7 @@ public class Actor {
 
     @ManyToMany(mappedBy = "actors")
     private List<Movie> movies;
-
-
+    
     public void setName(String name) {
         if (name.isBlank() || name.trim().isEmpty())
             throw new IllegalArgumentException("Actor name cannot be blank or empty");

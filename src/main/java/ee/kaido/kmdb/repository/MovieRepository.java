@@ -16,5 +16,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "AND (:genre IS NULL OR :genre MEMBER OF m.genres) " +
             "AND (:releaseYear IS NULL OR m.releasedYear = :releaseYear) " +
             "AND (:actor IS NULL OR :actor MEMBER OF m.actors)")
-    List<Movie> findMoviesByFilters(@Param("genre") Genre genreId, @Param("releaseYear") Integer releaseYear, @Param("actor") Actor actorId, @Param("title") String title);
+    List<Movie> getMoviesByFilters(@Param("genre") Genre genreId, @Param("releaseYear") Integer releaseYear, @Param("actor") Actor actorId, @Param("title") String title);
 }

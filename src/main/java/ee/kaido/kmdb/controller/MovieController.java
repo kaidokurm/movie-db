@@ -1,7 +1,7 @@
 package ee.kaido.kmdb.controller;
 
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
-import ee.kaido.kmdb.model.Actor;
+import ee.kaido.kmdb.model.ActorDTO;
 import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.model.MovieDTO;
 import ee.kaido.kmdb.service.MovieService;
@@ -26,39 +26,24 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.CREATED).body(movieService.addMovie(movie));
     }
 
-    @GetMapping("movie")
-    public ResponseEntity<List<MovieDTO>> getMovieById() {
-        List<Movie> movies = movieService.getAllMovies();
-//        List<MovieDTO> movieDTOs = new ArrayList<>();
-//        for (Movie movie : movies) {
-//            MovieDTO newMovie = new MovieDTO(
-//                    movie.getId(),
-//                    movie.getTitle(),
-//                    movie.getReleasedYear(),
-//                    movie.getDuration(),
-//                    movie.getActors().stream().map(actor -> new ActorDTO(actor.getId(), actor.getName(), actor.getBirthDate())).collect(Collectors.toList())
-//            );
-        List<MovieDTO> m = movies.stream().map(MovieDTO::new).toList();
-
-        return ResponseEntity.status(HttpStatus.OK).body(m);
-    }
-
-//    @GetMapping("movie")
-//    public ResponseEntity<List<Movie>> getAllMovies(@RequestParam(required = false) Integer page,
-//                                                    @RequestParam(required = false, defaultValue = "20") int size) throws BadRequestException {
-//        if (page != null) {
-//            if (page < 0 || size < 1) {
-//                throw new BadRequestException("Error in Page or Size value");
-//            }
-//            Pageable pageable = PageRequest.of(page, size);
-//            return ResponseEntity.ok().body(movieService.getAllMovies(pageable).getContent());
-//        }
-//        return ResponseEntity.ok().body(movieService.getAllMovies());
-//    }
-
     @GetMapping("movie/{id}")
     public ResponseEntity<Movie> getMovie(@PathVariable long id) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.findMovieById(id));
+        return ResponseEntity.ok().body(movieService.getMovieById(id));
+    }
+
+    @GetMapping({"movies", "movie", "movies/search"})
+    public ResponseEntity<List<MovieDTO>> getMoviesByFilter(
+            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer releaseYear,
+            @RequestParam(required = false) Long actorId,
+            @RequestParam(required = false) String title
+    ) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(movieService.getMoviesByFilter(genreId, releaseYear, actorId, title));
+    }
+
+    @GetMapping("movies/{movieId}/actors")
+    public ResponseEntity<List<ActorDTO>> getActorsByMovie(@PathVariable long movieId) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(movieService.getActorsInMovie(movieId));
     }
 
     @PatchMapping("movie/{id}")
@@ -69,20 +54,5 @@ public class MovieController {
     @DeleteMapping("movie/{id}")
     public ResponseEntity<String> deleteMovie(@PathVariable long id) {
         return ResponseEntity.ok(movieService.deleteMovie(id));
-    }
-
-    @GetMapping({"movies", "movies/search"})
-    public ResponseEntity<List<Movie>> getMoviesByFilter(
-            @RequestParam(required = false) Long genreId,
-            @RequestParam(required = false) Integer releaseYear,
-            @RequestParam(required = false) Long actorId,
-            @RequestParam(required = false) String title
-    ) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.getMoviesByFilter(genreId, releaseYear, actorId, title));
-    }
-
-    @GetMapping("movies/{movieId}/actors")
-    public ResponseEntity<List<Actor>> getActorsByMovie(@PathVariable long movieId) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.getActorsInMovie(movieId));
     }
 }

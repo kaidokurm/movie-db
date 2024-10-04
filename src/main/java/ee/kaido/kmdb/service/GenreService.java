@@ -22,17 +22,8 @@ public class GenreService {
         return genreRepository.save(genre);
     }
 
-    private void validateGenre(Genre genre) throws ElementExistsException {
-        if (genre.getId() != null && genreRepository.findById(genre.getId()).isPresent())
-            throw new ElementExistsException("Genre with id " + genre.getId() + " already exists");
-        if (genre.getName().trim().isEmpty())
-            throw new IllegalArgumentException("Genre name can't be empty!");
-        if (genreRepository.findByName(genre.getName()) != null)
-            throw new ElementExistsException("Genre with name " + genre.getName() + " already exists");
-    }
-
-    public List<Genre> getAllGenres() {
-        return genreRepository.findAll();
+    public List<Genre> getAllGenresByName(String name) {
+        return genreRepository.findAllByName(name);
     }
 
     public Genre getGenreById(Long id) throws ResourceNotFoundException {
@@ -45,6 +36,12 @@ public class GenreService {
         return genreRepository.save(genre);
     }
 
+    public String deleteGenre(Long id) throws ResourceNotFoundException {
+        this.getGenreById(id);
+        genreRepository.deleteById(id);
+        return "Genre with id " + id + " has been deleted";
+    }
+
     private static void updateGenreName(Map<String, Object> updates, Genre genre) {
         if (updates.containsKey("name")) {
             String newName = (String) updates.get("name");
@@ -54,9 +51,12 @@ public class GenreService {
         }
     }
 
-    public String deleteGenre(Long id) throws ResourceNotFoundException {
-        this.getGenreById(id);
-        genreRepository.deleteById(id);
-        return "Genre with id " + id + " has been deleted";
+    private void validateGenre(Genre genre) throws ElementExistsException {
+        if (genre.getId() != null && genreRepository.findById(genre.getId()).isPresent())
+            throw new ElementExistsException("Genre with id " + genre.getId() + " already exists");
+        if (genre.getName() == null || genre.getName().trim().isEmpty())
+            throw new IllegalArgumentException("Genre name is required");
+        if (genreRepository.findByName(genre.getName()) != null)
+            throw new ElementExistsException("Genre with name " + genre.getName() + " already exists");
     }
 }
