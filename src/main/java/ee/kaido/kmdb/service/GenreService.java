@@ -54,9 +54,9 @@ public class GenreService {
         }
     }
 
-    public List<Genre> deleteGenre(Long id) throws ResourceNotFoundException {
+    public String deleteGenre(Long id) throws ResourceNotFoundException {
         this.getGenreById(id);
         genreRepository.deleteById(id);
-        return getAllGenres();
+        return "Genre with id " + id + " has been deleted";
     }
 }

@@ -44,7 +44,7 @@ public class GenreController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<Genre>> deleteGenre(@PathVariable long id) throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(genreService.deleteGenre(id));
+    public ResponseEntity<String> deleteGenre(@PathVariable long id) throws ResourceNotFoundException {
+        return ResponseEntity.ok(genreService.deleteGenre(id));
     }
 }

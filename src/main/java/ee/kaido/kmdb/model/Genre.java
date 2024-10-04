@@ -1,12 +1,14 @@
 package ee.kaido.kmdb.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
 
-@Setter
-@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Entity
 public class Genre {
     @Id
