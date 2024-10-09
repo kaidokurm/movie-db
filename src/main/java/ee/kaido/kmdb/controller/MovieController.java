@@ -22,12 +22,12 @@ public class MovieController {
     }
 
     @PostMapping("movie")
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) throws ResourceNotFoundException {
+    public ResponseEntity<MovieDTO> addMovie(@RequestBody Movie movie) {
         return ResponseEntity.status(HttpStatus.CREATED).body(movieService.addMovie(movie));
     }
 
     @GetMapping("movie/{id}")
-    public ResponseEntity<Movie> getMovie(@PathVariable long id) throws ResourceNotFoundException {
+    public ResponseEntity<MovieDTO> getMovie(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(movieService.getMovieById(id));
     }
 
@@ -47,7 +47,7 @@ public class MovieController {
     }
 
     @PatchMapping("movie/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException {
+    public ResponseEntity<MovieDTO> updateMovie(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(movieService.updateMovie(id, data));
     }
 

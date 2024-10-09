@@ -1,21 +1,17 @@
 package ee.kaido.kmdb.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -36,11 +32,15 @@ public class Movie {
     )
     private Set<Genre> genres;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "movie_actor",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "actor_id", referencedColumnName = "id")
     )
     private List<Actor> actors;
+
+    public void removeActor(Actor actor) {
+        this.getActors().remove(actor);
+    }
 }

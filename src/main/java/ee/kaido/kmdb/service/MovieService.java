@@ -2,7 +2,9 @@ package ee.kaido.kmdb.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
+import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import ee.kaido.kmdb.model.*;
 import ee.kaido.kmdb.repository.MovieRepository;
 import jakarta.validation.Valid;
@@ -18,25 +20,32 @@ import static ee.kaido.kmdb.service.checkers.Checks.checkIfStringNotEmpty;
 public class MovieService {
 
     private final MovieRepository movieRepository;
-    private final ObjectMapper mapper;
     private final GenreService genreService;
     private final ActorService actorService;
+    private final ObjectMapper objectMapper;
 
-    public MovieService(MovieRepository movieRepository, ObjectMapper mapper, GenreService genreService, ActorService actorService) {
+    public MovieService(MovieRepository movieRepository, GenreService genreService, ActorService actorService, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
-        this.mapper = mapper;
         this.genreService = genreService;
         this.actorService = actorService;
+        this.objectMapper = objectMapper;
+        registerDurationDeserializer();
     }
 
-    public Movie addMovie(@Valid Movie movie) {
+    private void registerDurationDeserializer() {
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Duration.class, new DurationDeserializer());
+        objectMapper.registerModule(module);
+    }
+
+    public MovieDTO addMovie(@Valid Movie movie) {
         validateMovieTitle(movie);
         validateMovieActorsAndGenres(movie);
-        return movieRepository.save(movie);
+        return new MovieDTO(movieRepository.save(movie), true);
     }
 
-    public Movie getMovieById(Long id) throws ResourceNotFoundException {
-        return movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id));
+    public MovieDTO getMovieById(Long id) throws ResourceNotFoundException {
+        return new MovieDTO(movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id)), true);
     }
 
     public List<MovieDTO> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId, String title) throws ResourceNotFoundException {
@@ -51,31 +60,35 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
-    public Movie updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
-        Movie movie = getMovieById(id);
-        JsonNode jsonNode = mapper.convertValue(updates, JsonNode.class);
+    public MovieDTO updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
+        Movie movie = movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id));
+        JsonNode jsonNode = objectMapper.convertValue(updates, JsonNode.class);
         updateMovieFields(jsonNode, movie);
-        return movieRepository.save(movie);
+        return new MovieDTO(movieRepository.save(movie), true);
     }
 
     private void updateMovieFields(JsonNode jsonNode, Movie movie) throws ResourceNotFoundException {
 
-        if (jsonNode.has("title")) {
-            String title = jsonNode.get("title").asText();
-            checkIfStringNotEmpty(title, "Movie title");
-            movie.setTitle(title);
-        }
+        updateMovieTitle(jsonNode, movie);
+        updateMovieReleasedYear(jsonNode, movie);
+        updateMovieDuration(jsonNode, movie);
+        updateMovieGenres(jsonNode, movie);
+        updateMovieActors(jsonNode, movie);
+    }
 
-        if (jsonNode.has("releasedYear")) {
-            movie.setReleasedYear(jsonNode.get("releasedYear").asInt());
+    private void updateMovieActors(JsonNode jsonNode, Movie movie) throws ResourceNotFoundException {
+        if (jsonNode.has("actors")) {
+            List<Actor> actors = new ArrayList<>();
+            JsonNode actorsJsonNode = jsonNode.get("actors");
+            for (JsonNode actorJsonNode : actorsJsonNode) {
+                long actorId = actorJsonNode.get("id").asLong();
+                actors.add(actorService.getActorById(actorId));
+            }
+            movie.setActors(actors);
         }
+    }
 
-        if (jsonNode.has("duration")) {
-            String durationString = jsonNode.get("duration").asText();
-            Duration duration = Duration.parse(durationString);
-            movie.setDuration(duration);
-        }
-
+    private void updateMovieGenres(JsonNode jsonNode, Movie movie) {
         if (jsonNode.has("genres")) {
             JsonNode genresJsonNode = jsonNode.get("genres");
             Set<Genre> genres = new HashSet<>();
@@ -88,15 +101,27 @@ public class MovieService {
             });
             movie.setGenres(genres);
         }
+    }
 
-        if (jsonNode.has("actors")) {
-            List<Actor> actors = new ArrayList<>();
-            JsonNode actorsJsonNode = jsonNode.get("actors");
-            for (JsonNode actorJsonNode : actorsJsonNode) {
-                long actorId = actorJsonNode.get("id").asLong();
-                actors.add(actorService.getActorById(actorId));
-            }
-            movie.setActors(actors);
+    private void updateMovieDuration(JsonNode jsonNode, Movie movie) {
+        if (jsonNode.has("duration")) {
+            String durationString = jsonNode.get("duration").asText();
+            Duration duration = objectMapper.convertValue(durationString, Duration.class);
+            movie.setDuration(duration);
+        }
+    }
+
+    private static void updateMovieReleasedYear(JsonNode jsonNode, Movie movie) {
+        if (jsonNode.has("releasedYear")) {
+            movie.setReleasedYear(jsonNode.get("releasedYear").asInt());
+        }
+    }
+
+    private static void updateMovieTitle(JsonNode jsonNode, Movie movie) {
+        if (jsonNode.has("title")) {
+            String title = jsonNode.get("title").asText();
+            checkIfStringNotEmpty(title, "Movie title");
+            movie.setTitle(title);
         }
     }
 
@@ -141,7 +166,8 @@ public class MovieService {
 
     public List<ActorDTO> getActorsInMovie(Long movieId) throws ResourceNotFoundException {
         try {
-            return getMovieById(movieId).getActors().stream().map(actor -> new ActorDTO(actor, false)).collect(Collectors.toList());
+            Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + movieId));
+            return movie.getActors().stream().map(actor -> new ActorDTO(actor, false)).collect(Collectors.toList());
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException("No actors found");
         }

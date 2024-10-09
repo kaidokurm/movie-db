@@ -21,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Actor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,9 +31,9 @@ public class Actor {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date birthDate;
 
-    @ManyToMany(mappedBy = "actors")
+    @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY)
     private List<Movie> movies;
-    
+
     public void setName(String name) {
         if (name.isBlank() || name.trim().isEmpty())
             throw new IllegalArgumentException("Actor name cannot be blank or empty");

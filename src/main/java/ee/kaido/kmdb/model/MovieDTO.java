@@ -20,6 +20,8 @@ public class MovieDTO {
 
     private Duration duration;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Genre> genres;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ActorDTO> actors;
 
     public MovieDTO(Movie movie, boolean actorVisible) {
@@ -27,6 +29,7 @@ public class MovieDTO {
         this.title = movie.getTitle();
         this.releasedYear = movie.getReleasedYear();
         this.duration = movie.getDuration();
+        this.genres = movie.getGenres() == null ? null : new ArrayList<>(movie.getGenres());
         if (actorVisible && movie.getActors() != null) {
             List<ActorDTO> actors = new ArrayList<>();
             for (Actor actor : movie.getActors()) {
