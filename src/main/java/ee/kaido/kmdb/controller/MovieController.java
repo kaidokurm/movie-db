@@ -40,10 +40,12 @@ public class MovieController {
             @RequestParam(required = false) Long genreId,
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) Long actorId,
-            @RequestParam(required = false) String title
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size
     ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(genreId, releaseYear, actorId, title));
+                movieService.getMoviesByFilter(genreId, releaseYear, actorId, title,page,size));
     }
 
     @GetMapping("movies/{movieId}/actors")
@@ -63,9 +65,9 @@ public class MovieController {
     }
 
     @DeleteMapping("movie/{id}")
-    public ResponseEntity<String> deleteMovie(
+    public ResponseEntity deleteMovie(
             @PathVariable long id) {
-        return ResponseEntity.ok(
-                movieService.deleteMovie(id));
+        movieService.deleteMovie(id);
+        return ResponseEntity.noContent().build();
     }
 }

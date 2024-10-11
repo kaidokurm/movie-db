@@ -40,7 +40,7 @@ public class ActorService {
         if (jsonNode.has("id"))
             checkIfActorIdExists(jsonNode.get("id").asLong(), actorRepository);
         Actor actor = new Actor();
-        updateActorFields(jsonNode, actor);
+        updateActorFields(jsonNode, actor,true);
         Actor savedActor = actorRepository.save(actor);
         return new ActorDTO(savedActor, true);
     }
@@ -56,14 +56,14 @@ public class ActorService {
         return new ActorDTO(getActorById(id), true);
     }
 
-    public Actor getActorById(long id) throws ResourceNotFoundException {
+    public  Actor getActorById(long id) throws ResourceNotFoundException {
         return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
     }
 
     public ActorDTO updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
         Actor actor = getActorById(id);
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
-        updateActorFields(jsonNode, actor);
+        updateActorFields(jsonNode, actor,false);
         Actor savedActor = actorRepository.save(actor);
         return new ActorDTO(savedActor, true);
     }
@@ -86,17 +86,19 @@ public class ActorService {
         movies.forEach((movie) -> movie.removeActor(actor));
     }
 
-    private void updateActorFields(JsonNode jsonNode, Actor actor) throws BadRequestException, ResourceNotFoundException {
+    private void updateActorFields(JsonNode jsonNode, Actor actor,boolean create) throws BadRequestException, ResourceNotFoundException {
         updateName(jsonNode, actor);
         updateBirthDate(jsonNode, actor);
-        updateMovies(jsonNode, actor);
+        updateMovies(jsonNode, actor,create);
     }
 
-    private void updateMovies(JsonNode jsonNode, Actor actor) throws ResourceNotFoundException {
+    private void updateMovies(JsonNode jsonNode, Actor actor,boolean create) throws ResourceNotFoundException {
         if (jsonNode.has("movies")) {
             List<Movie> movies = new ArrayList<>();
             JsonNode moviesJsonNode = jsonNode.get("movies");
-            removeActorFromMovie(actor);
+            if(!create) {
+                removeActorFromMovie(actor);
+            }
             for (JsonNode movieJsonNode : moviesJsonNode) {
                 Long movieId = movieJsonNode.get("id").asLong();
                 Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + movieId));

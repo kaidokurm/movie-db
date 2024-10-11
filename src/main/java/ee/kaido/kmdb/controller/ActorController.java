@@ -40,6 +40,7 @@ public class ActorController {
     public ResponseEntity<ActorDTO> getActorById(
             @PathVariable long id)
             throws ResourceNotFoundException {
+        System.out.println("getMappingId");
         return ResponseEntity.ok().body(
                 actorService.findActorDtoById(id));
     }

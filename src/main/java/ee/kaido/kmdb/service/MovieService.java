@@ -8,6 +8,8 @@ import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import ee.kaido.kmdb.model.*;
 import ee.kaido.kmdb.repository.MovieRepository;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -48,16 +50,41 @@ public class MovieService {
         return new MovieDTO(movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id)), true);
     }
 
-    public List<MovieDTO> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId, String title) throws ResourceNotFoundException {
+    public List<MovieDTO> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId, String title,Integer page,Integer size) throws ResourceNotFoundException {
         Genre genre = null;
         Actor actor = null;
         if (genreId != null)
             genre = genreService.getGenreByIdOrThrowError(genreId);
         if (actorId != null)
             actor = actorService.getActorById(actorId);
-        return movieRepository.getMoviesByFilters(genre, releaseYear, actor, title).stream()
-                .map(movie -> new MovieDTO(movie, actorId == null))
-                .collect(Collectors.toList());
+
+        //check if Pageable is ok
+        if(page!=null&&page>=0&&size!=null&&size>0) {
+            Pageable pageable = PageRequest.of(page, size);
+            return movieRepository
+                    .getMoviesByFiltersPageable(
+                            genre,
+                            releaseYear,
+                            actor,
+                            title,
+                            pageable)
+                    .stream()
+                    .map(movie -> new MovieDTO(movie, true))
+                    .collect(Collectors.toList());
+
+
+        }else{
+            //else get list without pageable
+            return movieRepository
+                    .getMoviesByFilters(
+                            genre,
+                            releaseYear,
+                            actor,
+                            title)
+                    .stream()
+                    .map(movie -> new MovieDTO(movie, true))
+                    .collect(Collectors.toList());
+        }
     }
 
     public MovieDTO updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
@@ -125,9 +152,8 @@ public class MovieService {
         }
     }
 
-    public String deleteMovie(Long id) {
+    public void deleteMovie(Long id) {
         movieRepository.deleteById(id);
-        return "Movie with id: " + id + " was deleted";
     }
 
     private void validateMovieActorsAndGenres(Movie movie) {

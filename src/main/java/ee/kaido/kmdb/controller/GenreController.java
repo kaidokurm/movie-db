@@ -49,7 +49,7 @@ public class GenreController {
     @GetMapping("/{id}/movies")
     public ResponseEntity<List<MovieDTO>> getGenreMovies(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(id, null, null, null));
+                movieService.getMoviesByFilter(id, null, null, null,null,null));
     }
 
     @PatchMapping("/{id}")
