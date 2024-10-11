@@ -4,6 +4,7 @@ import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ElementExistsException;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.ActorDTO;
+import ee.kaido.kmdb.model.MovieDTO;
 import ee.kaido.kmdb.service.ActorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,27 +24,48 @@ public class ActorController {
 
     @PostMapping("")
     public ResponseEntity<ActorDTO> createActor(@RequestBody Map<String, Object> data) throws ElementExistsException, BadRequestException, ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.addActor(data));
+        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.createActor(data));
     }
 
     @GetMapping({"", "/find"})
-    public ResponseEntity<List<ActorDTO>> getActorsByFilter(@RequestParam(required = false) String name, @RequestParam(required = false, defaultValue = "true") boolean showMovies) {
-        return ResponseEntity.ok().body(actorService.getActorsByFilter(name, showMovies));
+    public ResponseEntity<List<ActorDTO>> getActorsByFilter(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false, defaultValue = "true") boolean showMovies) {
+        return ResponseEntity.ok().body(
+                actorService.getActorsByFilter(name, showMovies));
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ActorDTO> getActorById(@PathVariable int id) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(actorService.findActorDtoById(id));
+    public ResponseEntity<ActorDTO> getActorById(
+            @PathVariable long id)
+            throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(
+                actorService.findActorDtoById(id));
+    }
+
+    @GetMapping("/{id}/movies")
+    public ResponseEntity<List<MovieDTO>> getActorMovies(
+            @PathVariable long id) {
+        return ResponseEntity.ok().body(
+                actorService.getActorMovies(id));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ActorDTO> updateActor(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.updateActor(id, data));
+    public ResponseEntity<ActorDTO> updateActor(
+            @PathVariable long id,
+            @RequestBody Map<String, Object> data)
+            throws ResourceNotFoundException, BadRequestException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                actorService.updateActor(id, data));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteActor(@PathVariable long id) throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(actorService.deleteActor(id));
+    public ResponseEntity<String> deleteActor(
+            @PathVariable long id,
+            @RequestParam(required = false, defaultValue = "false") boolean force)
+            throws ResourceNotFoundException, BadRequestException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                actorService.deleteActor(id, force));
     }
 }

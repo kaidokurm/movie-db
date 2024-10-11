@@ -8,6 +8,7 @@ import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Actor;
 import ee.kaido.kmdb.model.ActorDTO;
 import ee.kaido.kmdb.model.Movie;
+import ee.kaido.kmdb.model.MovieDTO;
 import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static ee.kaido.kmdb.service.checkers.Checks.checkIfActorIdExists;
 import static ee.kaido.kmdb.service.checkers.Checks.checkIfStringNotEmpty;
 
 @Service
@@ -32,10 +35,10 @@ public class ActorService {
         this.movieRepository = movieRepository;
     }
 
-    public ActorDTO addActor(Map<String, Object> data) throws ElementExistsException, BadRequestException, ResourceNotFoundException {
+    public ActorDTO createActor(Map<String, Object> data) throws ElementExistsException, BadRequestException, ResourceNotFoundException {
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
         if (jsonNode.has("id"))
-            checkIfActorIdExists(jsonNode.get("id").asLong());
+            checkIfActorIdExists(jsonNode.get("id").asLong(), actorRepository);
         Actor actor = new Actor();
         updateActorFields(jsonNode, actor);
         Actor savedActor = actorRepository.save(actor);
@@ -50,7 +53,7 @@ public class ActorService {
     }
 
     public ActorDTO findActorDtoById(long id) throws ResourceNotFoundException {
-        return new ActorDTO(actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id)), true);
+        return new ActorDTO(getActorById(id), true);
     }
 
     public Actor getActorById(long id) throws ResourceNotFoundException {
@@ -58,22 +61,29 @@ public class ActorService {
     }
 
     public ActorDTO updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
-        Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
+        Actor actor = getActorById(id);
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
         updateActorFields(jsonNode, actor);
         Actor savedActor = actorRepository.save(actor);
         return new ActorDTO(savedActor, true);
     }
 
-    public String deleteActor(Long id) throws ResourceNotFoundException {
-        getActorById(id);
+    public String deleteActor(Long id, boolean force) throws ResourceNotFoundException, BadRequestException {
+        Actor actor = getActorById(id);
+        if (!force) {
+            int movieCount = actor.getMovies().size();
+            if (movieCount != 0)
+                throw new BadRequestException("Unable to delete actor '" + actor.getName() +
+                        "' as they are associated with " + movieCount + " movie" +
+                        (movieCount > 1 ? "s" : ""));
+        }
         actorRepository.deleteById(id);
         return "Actor with id " + id + " was deleted";
     }
 
-    private void checkIfActorIdExists(Long id) throws ElementExistsException {
-        if (id != null && actorRepository.findById(id).isPresent())
-            throw new ElementExistsException("Actor with id " + id + " already exists");
+    private void removeActorFromMovie(Actor actor) {
+        List<Movie> movies = movieRepository.getMoviesByFilters(null, null, actor, null);
+        movies.forEach((movie) -> movie.removeActor(actor));
     }
 
     private void updateActorFields(JsonNode jsonNode, Actor actor) throws BadRequestException, ResourceNotFoundException {
@@ -98,11 +108,6 @@ public class ActorService {
         }
     }
 
-    private void removeActorFromMovie(Actor actor) {
-        List<Movie> movies = movieRepository.getMoviesByFilters(null, null, actor, null);
-        movies.forEach((movie) -> movie.removeActor(actor));
-    }
-
     private static void updateBirthDate(JsonNode jsonNode, Actor actor) throws BadRequestException {
         if (jsonNode.has("birthDate")) {
             actor.setBirthDate(jsonNode.get("birthDate").asText());
@@ -115,5 +120,14 @@ public class ActorService {
                     checkIfStringNotEmpty(jsonNode.get("name").asText(), "Actor name")
             );
         }
+    }
+
+    public List<MovieDTO> getActorMovies(long id) {
+        return actorRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No actor found with id: " + id))
+                .getMovies()
+                .stream()
+                .map(movie ->
+                        new MovieDTO(movie, false))
+                .collect(Collectors.toList());
     }
 }

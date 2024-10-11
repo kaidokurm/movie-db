@@ -52,7 +52,7 @@ public class MovieService {
         Genre genre = null;
         Actor actor = null;
         if (genreId != null)
-            genre = genreService.getGenreById(genreId);
+            genre = genreService.getGenreByIdOrThrowError(genreId);
         if (actorId != null)
             actor = actorService.getActorById(actorId);
         return movieRepository.getMoviesByFilters(genre, releaseYear, actor, title).stream()
@@ -94,7 +94,7 @@ public class MovieService {
             Set<Genre> genres = new HashSet<>();
             genresJsonNode.forEach(genre -> {
                 try {
-                    genres.add(genreService.getGenreById(genre.get("id").asLong()));
+                    genres.add(genreService.getGenreByIdOrThrowError(genre.get("id").asLong()));
                 } catch (ResourceNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -148,7 +148,7 @@ public class MovieService {
         if (movie.getGenres() != null) {
             Set<Genre> genres = movie.getGenres().stream().map(genre -> {
                 try {
-                    return genreService.getGenreById(genre.getId());
+                    return genreService.getGenreByIdOrThrowError(genre.getId());
                 } catch (ResourceNotFoundException e) {
                     throw new RuntimeException(e);
                 }

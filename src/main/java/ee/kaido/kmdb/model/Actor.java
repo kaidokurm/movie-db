@@ -27,7 +27,7 @@ public class Actor {
     private Long id;
     private String name;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date birthDate;
 

@@ -22,13 +22,17 @@ public class MovieController {
     }
 
     @PostMapping("movie")
-    public ResponseEntity<MovieDTO> addMovie(@RequestBody Movie movie) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(movieService.addMovie(movie));
+    public ResponseEntity<MovieDTO> addMovie(
+            @RequestBody Movie movie) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                movieService.addMovie(movie));
     }
 
     @GetMapping("movie/{id}")
-    public ResponseEntity<MovieDTO> getMovie(@PathVariable long id) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.getMovieById(id));
+    public ResponseEntity<MovieDTO> getMovie(
+            @PathVariable long id) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(
+                movieService.getMovieById(id));
     }
 
     @GetMapping({"movies", "movie", "movies/search"})
@@ -38,21 +42,30 @@ public class MovieController {
             @RequestParam(required = false) Long actorId,
             @RequestParam(required = false) String title
     ) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.getMoviesByFilter(genreId, releaseYear, actorId, title));
+        return ResponseEntity.ok().body(
+                movieService.getMoviesByFilter(genreId, releaseYear, actorId, title));
     }
 
     @GetMapping("movies/{movieId}/actors")
-    public ResponseEntity<List<ActorDTO>> getActorsByMovie(@PathVariable long movieId) throws ResourceNotFoundException {
-        return ResponseEntity.ok().body(movieService.getActorsInMovie(movieId));
+    public ResponseEntity<List<ActorDTO>> getActorsByMovie(
+            @PathVariable long movieId) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(
+                movieService.getActorsInMovie(movieId));
     }
 
     @PatchMapping("movie/{id}")
-    public ResponseEntity<MovieDTO> updateMovie(@PathVariable long id, @RequestBody Map<String, Object> data) throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(movieService.updateMovie(id, data));
+    public ResponseEntity<MovieDTO> updateMovie(
+            @PathVariable long id,
+            @RequestBody Map<String, Object> data)
+            throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                movieService.updateMovie(id, data));
     }
 
     @DeleteMapping("movie/{id}")
-    public ResponseEntity<String> deleteMovie(@PathVariable long id) {
-        return ResponseEntity.ok(movieService.deleteMovie(id));
+    public ResponseEntity<String> deleteMovie(
+            @PathVariable long id) {
+        return ResponseEntity.ok(
+                movieService.deleteMovie(id));
     }
 }

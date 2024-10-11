@@ -6,9 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class KmdbApplication {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		SpringApplication.run(KmdbApplication.class, args);
-	}
-
+        SpringApplication.run(KmdbApplication.class, args);
+    }
 }

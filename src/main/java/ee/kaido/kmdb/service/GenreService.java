@@ -1,9 +1,11 @@
 package ee.kaido.kmdb.service;
 
+import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ElementExistsException;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.repository.GenreRepository;
+import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +18,8 @@ import java.util.Map;
 public class GenreService {
     @Autowired
     private GenreRepository genreRepository;
+    @Autowired
+    private MovieRepository movieRepository;
 
     public Genre addGenre(Genre genre) throws ElementExistsException {
         validateGenre(genre);
@@ -26,18 +30,28 @@ public class GenreService {
         return genreRepository.findAllByName(name);
     }
 
-    public Genre getGenreById(Long id) throws ResourceNotFoundException {
+    public Genre getGenreByIdOrThrowError(Long id) throws ResourceNotFoundException {
         return genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No genre found with id: " + id));
     }
 
     public Genre updateGenre(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
-        Genre genre = getGenreById(id);
+        Genre genre = getGenreByIdOrThrowError(id);
         updateGenreName(updates, genre);
         return genreRepository.save(genre);
     }
 
-    public String deleteGenre(Long id) throws ResourceNotFoundException {
-        this.getGenreById(id);
+    public String deleteGenre(Long id, boolean force) throws BadRequestException, ResourceNotFoundException {
+        //try to get genre
+        Genre genre = getGenreByIdOrThrowError(id);
+        int movieCount = movieRepository.getMoviesByFilters(genre, null, null, null).size();
+        if (!force)
+            if (movieCount != 0)
+                throw new BadRequestException("Cannot delete genre '"
+                        + genre.getName()
+                        + "' because it has "
+                        + movieCount
+                        + " associated movie"
+                        + (movieCount > 1 ? "s" : ""));//if more then 1 add s
         genreRepository.deleteById(id);
         return "Genre with id " + id + " has been deleted";
     }
