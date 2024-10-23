@@ -42,7 +42,8 @@ public class MovieService {
 
     public MovieDTO addMovie(@Valid Movie movie) {
         validateMovieTitle(movie);
-        validateMovieActorsAndGenres(movie);
+        validateMovieActors(movie);
+        validateMovieGenres(movie);
         return new MovieDTO(movieRepository.save(movie), true);
     }
 
@@ -50,41 +51,52 @@ public class MovieService {
         return new MovieDTO(movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + id)), true);
     }
 
-    public List<MovieDTO> getMoviesByFilter(Long genreId, Integer releaseYear, Long actorId, String title,Integer page,Integer size) throws ResourceNotFoundException {
+    public List<MovieDTO> getMoviesByFilter(Long genreId,
+                                            Integer releaseYear,
+                                            Long actorId,
+                                            String title,
+                                            Integer page,
+                                            Integer size) throws ResourceNotFoundException {
         Genre genre = null;
         Actor actor = null;
         if (genreId != null)
             genre = genreService.getGenreByIdOrThrowError(genreId);
         if (actorId != null)
-            actor = actorService.getActorById(actorId);
+            actor = actorService.getActorByIdOrThrowError(actorId);
 
         //check if Pageable is ok
         if(page!=null&&page>=0&&size!=null&&size>0) {
-            Pageable pageable = PageRequest.of(page, size);
-            return movieRepository
-                    .getMoviesByFiltersPageable(
-                            genre,
-                            releaseYear,
-                            actor,
-                            title,
-                            pageable)
-                    .stream()
-                    .map(movie -> new MovieDTO(movie, true))
-                    .collect(Collectors.toList());
-
-
+            return getFilteredMoviesPageable(releaseYear, title, page, size, genre, actor);
         }else{
             //else get list without pageable
-            return movieRepository
-                    .getMoviesByFilters(
-                            genre,
-                            releaseYear,
-                            actor,
-                            title)
-                    .stream()
-                    .map(movie -> new MovieDTO(movie, true))
-                    .collect(Collectors.toList());
+            return getMovieDTOS(releaseYear, title, genre, actor);
         }
+    }
+
+    private List<MovieDTO> getMovieDTOS(Integer releaseYear, String title, Genre genre, Actor actor) {
+        return movieRepository
+                .getMoviesByFilters(
+                        genre,
+                        releaseYear,
+                        actor,
+                        title)
+                .stream()
+                .map(movie -> new MovieDTO(movie, true))
+                .collect(Collectors.toList());
+    }
+
+    private List<MovieDTO> getFilteredMoviesPageable(Integer releaseYear, String title, Integer page, Integer size, Genre genre, Actor actor) {
+        Pageable pageable = PageRequest.of(page, size);
+        return movieRepository
+                .getMoviesByFiltersPageable(
+                        genre,
+                        releaseYear,
+                        actor,
+                        title,
+                        pageable)
+                .stream()
+                .map(movie -> new MovieDTO(movie, true))
+                .collect(Collectors.toList());
     }
 
     public MovieDTO updateMovie(Long id, Map<String, Object> updates) throws ResourceNotFoundException {
@@ -109,7 +121,7 @@ public class MovieService {
             JsonNode actorsJsonNode = jsonNode.get("actors");
             for (JsonNode actorJsonNode : actorsJsonNode) {
                 long actorId = actorJsonNode.get("id").asLong();
-                actors.add(actorService.getActorById(actorId));
+                actors.add(actorService.getActorByIdOrThrowError(actorId));
             }
             movie.setActors(actors);
         }
@@ -156,20 +168,24 @@ public class MovieService {
         movieRepository.deleteById(id);
     }
 
-    private void validateMovieActorsAndGenres(Movie movie) {
+
+    private void validateMovieActors(Movie movie) {
+        List<Actor> actors=movie.getActors();
         //find all actors by id
-        if (!movie.getActors().isEmpty()) {
-            List<Actor> actors = movie.getActors().stream().map(actor -> {
+        if (actors!=null&&!actors.isEmpty()) {
+            List<Actor> newActors = movie.getActors().stream().map(actor -> {
                         try {
-                            return actorService.getActorById(actor.getId());
+                            return actorService.getActorByIdOrThrowError(actor.getId());
                         } catch (ResourceNotFoundException e) {
                             throw new RuntimeException("One or more Actor were not found", e);
                         }
                     }
             ).collect(Collectors.toList());
-            movie.setActors(actors);
+            movie.setActors(newActors);
         }
+    }
 
+    private void validateMovieGenres(Movie movie) {
         //find all genres by id
         if (movie.getGenres() != null) {
             Set<Genre> genres = movie.getGenres().stream().map(genre -> {
@@ -184,7 +200,8 @@ public class MovieService {
     }
 
     private void validateMovieTitle(Movie movie) {
-        if (movie.getTitle().equals(null) || movie.getTitle().trim().isEmpty()) {
+        String title = movie.getTitle();
+        if (title==null|| title.trim().isEmpty()) {
             throw new IllegalArgumentException("Movie title cannot be empty");
         }
     }

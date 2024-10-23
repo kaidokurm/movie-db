@@ -26,8 +26,9 @@ public class Actor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
-
+    // Returns formated json
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date birthDate;

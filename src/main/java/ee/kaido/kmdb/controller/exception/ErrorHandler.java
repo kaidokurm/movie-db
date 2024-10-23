@@ -1,5 +1,6 @@
 package ee.kaido.kmdb.controller.exception;
 
+import org.hibernate.PropertyValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,6 +19,10 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(ElementExistsException e) {
+        return getExceptionResponseModelResponseEntity(e.getMessage());
+    }
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponseModel> handleException(PropertyValueException e){
         return getExceptionResponseModelResponseEntity(e.getMessage());
     }
 

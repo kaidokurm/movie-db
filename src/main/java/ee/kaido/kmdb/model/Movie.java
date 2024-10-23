@@ -19,6 +19,7 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String title;
     private int releasedYear;
     @JsonDeserialize(using = DurationDeserializer.class)
@@ -42,5 +43,9 @@ public class Movie {
 
     public void removeActor(Actor actor) {
         this.getActors().remove(actor);
+    }
+
+    public void removeGenre(Genre genre) {
+        this.getGenres().remove(genre);
     }
 }

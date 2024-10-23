@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Validated
 @RestController
@@ -41,29 +42,29 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Genre> getGenreById(@PathVariable long id) throws ResourceNotFoundException {
+    public ResponseEntity<Optional<Genre>> getGenreById(@PathVariable long id) {
         return ResponseEntity.ok().body(
-                genreService.getGenreByIdOrThrowError(id));
+                genreService.getGenreById(id));
     }
 
     @GetMapping("/{id}/movies")
     public ResponseEntity<List<MovieDTO>> getGenreMovies(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(id, null, null, null,null,null));
+                movieService.getMoviesByFilter(id,null,null,null,null,null));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody Map<String, Object> genre) throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+        return ResponseEntity.ok().body(
                 genreService.updateGenre(id, genre));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteGenre(
+    public ResponseEntity<Void> deleteGenre(
             @PathVariable long id,
             @RequestParam(required = false, defaultValue = "false") boolean force)
             throws ResourceNotFoundException, BadRequestException {
-        return ResponseEntity.ok(
-                genreService.deleteGenre(id, force));
+        genreService.deleteGenre(id, force);
+        return ResponseEntity.noContent().build();
     }
 }

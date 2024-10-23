@@ -13,10 +13,7 @@ import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ee.kaido.kmdb.service.checkers.Checks.checkIfActorIdExists;
@@ -53,23 +50,23 @@ public class ActorService {
     }
 
     public ActorDTO findActorDtoById(long id) throws ResourceNotFoundException {
-        return new ActorDTO(getActorById(id), true);
+        return new ActorDTO(getActorByIdOrThrowError(id), true);
     }
 
-    public  Actor getActorById(long id) throws ResourceNotFoundException {
+    public  Actor getActorByIdOrThrowError(long id) throws ResourceNotFoundException {
         return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
     }
 
     public ActorDTO updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
-        Actor actor = getActorById(id);
+        Actor actor = getActorByIdOrThrowError(id);
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
         updateActorFields(jsonNode, actor,false);
         Actor savedActor = actorRepository.save(actor);
         return new ActorDTO(savedActor, true);
     }
 
-    public String deleteActor(Long id, boolean force) throws ResourceNotFoundException, BadRequestException {
-        Actor actor = getActorById(id);
+    public void deleteActor(Long id, boolean force) throws ResourceNotFoundException, BadRequestException {
+        Actor actor = getActorByIdOrThrowError(id);
         if (!force) {
             int movieCount = actor.getMovies().size();
             if (movieCount != 0)
@@ -78,7 +75,6 @@ public class ActorService {
                         (movieCount > 1 ? "s" : ""));
         }
         actorRepository.deleteById(id);
-        return "Actor with id " + id + " was deleted";
     }
 
     private void removeActorFromMovie(Actor actor) {
@@ -125,6 +121,7 @@ public class ActorService {
     }
 
     public List<MovieDTO> getActorMovies(long id) {
+
         return actorRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No actor found with id: " + id))
                 .getMovies()
                 .stream()

@@ -19,10 +19,12 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, PagingAndSo
             "AND (:releaseYear IS NULL OR m.releasedYear = :releaseYear) " +
             "AND (:actor IS NULL OR :actor MEMBER OF m.actors)")
     List<Movie> getMoviesByFilters(@Param("genre") Genre genreId, @Param("releaseYear") Integer releaseYear, @Param("actor") Actor actorId, @Param("title") String title);
+
     @Query("SELECT m FROM Movie m " +
             "WHERE (:title IS NULL OR LOWER(m.title) LIKE %:title%) " +
             "AND (:genre IS NULL OR :genre MEMBER OF m.genres) " +
             "AND (:releaseYear IS NULL OR m.releasedYear = :releaseYear) " +
             "AND (:actor IS NULL OR :actor MEMBER OF m.actors)")
     List<Movie> getMoviesByFiltersPageable(@Param("genre") Genre genreId, @Param("releaseYear") Integer releaseYear, @Param("actor") Actor actorId, @Param("title") String title,Pageable pageable);
+
 }

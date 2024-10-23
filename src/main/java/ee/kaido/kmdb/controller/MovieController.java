@@ -60,7 +60,7 @@ public class MovieController {
             @PathVariable long id,
             @RequestBody Map<String, Object> data)
             throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+        return ResponseEntity.ok().body(
                 movieService.updateMovie(id, data));
     }
 

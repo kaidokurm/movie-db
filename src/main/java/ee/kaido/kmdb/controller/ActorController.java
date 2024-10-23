@@ -57,16 +57,16 @@ public class ActorController {
             @PathVariable long id,
             @RequestBody Map<String, Object> data)
             throws ResourceNotFoundException, BadRequestException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+        return ResponseEntity.ok().body(
                 actorService.updateActor(id, data));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteActor(
+    public ResponseEntity<Void> deleteActor(
             @PathVariable long id,
             @RequestParam(required = false, defaultValue = "false") boolean force)
             throws ResourceNotFoundException, BadRequestException {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                actorService.deleteActor(id, force));
+        actorService.deleteActor(id, force);
+        return ResponseEntity.noContent().build();
     }
 }
