@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class Actor {
                 LocalDate localDate = LocalDate.parse(date, formatter);
                 this.birthDate = Date.from(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
             } catch (DateTimeParseException e) {
-                throw new BadRequestException(date + " is not a valid date format 'yyyy-MM-dd'");
+                throw new BadRequestException(date + " is not a valid date format 'YYYY-MM-dd'");
             }
         }
     }

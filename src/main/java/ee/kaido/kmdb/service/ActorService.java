@@ -13,7 +13,10 @@ import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static ee.kaido.kmdb.service.checkers.Checks.checkIfActorIdExists;
@@ -37,7 +40,7 @@ public class ActorService {
         if (jsonNode.has("id"))
             checkIfActorIdExists(jsonNode.get("id").asLong(), actorRepository);
         Actor actor = new Actor();
-        updateActorFields(jsonNode, actor,true);
+        updateActorFields(jsonNode, actor, true);
         Actor savedActor = actorRepository.save(actor);
         return new ActorDTO(savedActor, true);
     }
@@ -53,14 +56,14 @@ public class ActorService {
         return new ActorDTO(getActorByIdOrThrowError(id), true);
     }
 
-    public  Actor getActorByIdOrThrowError(long id) throws ResourceNotFoundException {
+    public Actor getActorByIdOrThrowError(long id) throws ResourceNotFoundException {
         return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
     }
 
     public ActorDTO updateActor(Long id, Map<String, Object> data) throws ResourceNotFoundException, BadRequestException {
         Actor actor = getActorByIdOrThrowError(id);
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
-        updateActorFields(jsonNode, actor,false);
+        updateActorFields(jsonNode, actor, false);
         Actor savedActor = actorRepository.save(actor);
         return new ActorDTO(savedActor, true);
     }
@@ -82,17 +85,17 @@ public class ActorService {
         movies.forEach((movie) -> movie.removeActor(actor));
     }
 
-    private void updateActorFields(JsonNode jsonNode, Actor actor,boolean create) throws BadRequestException, ResourceNotFoundException {
+    private void updateActorFields(JsonNode jsonNode, Actor actor, boolean create) throws BadRequestException, ResourceNotFoundException {
         updateName(jsonNode, actor);
         updateBirthDate(jsonNode, actor);
-        updateMovies(jsonNode, actor,create);
+        updateMovies(jsonNode, actor, create);
     }
 
-    private void updateMovies(JsonNode jsonNode, Actor actor,boolean create) throws ResourceNotFoundException {
+    private void updateMovies(JsonNode jsonNode, Actor actor, boolean create) throws ResourceNotFoundException {
         if (jsonNode.has("movies")) {
             List<Movie> movies = new ArrayList<>();
             JsonNode moviesJsonNode = jsonNode.get("movies");
-            if(!create) {
+            if (!create) {
                 removeActorFromMovie(actor);
             }
             for (JsonNode movieJsonNode : moviesJsonNode) {

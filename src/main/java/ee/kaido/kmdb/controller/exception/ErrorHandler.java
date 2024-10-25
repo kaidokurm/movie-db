@@ -1,5 +1,6 @@
 package ee.kaido.kmdb.controller.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.PropertyValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,9 @@ public class ErrorHandler {
     public ResponseEntity<ExceptionResponseModel> handleException(ElementExistsException e) {
         return getExceptionResponseModelResponseEntity(e.getMessage());
     }
+
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponseModel> handleException(PropertyValueException e){
+    public ResponseEntity<ExceptionResponseModel> handleException(PropertyValueException e) {
         return getExceptionResponseModelResponseEntity(e.getMessage());
     }
 
@@ -43,6 +45,16 @@ public class ErrorHandler {
         response.setTimestamp(new Date());
         response.setMessage(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponseModel> handleException(EntityNotFoundException e) {
+        ExceptionResponseModel response = new ExceptionResponseModel();
+        response.setHttpStatus(HttpStatus.NOT_FOUND);
+        response.setHttpStatusCode(HttpStatus.NOT_FOUND.value());
+        response.setTimestamp(new Date());
+        response.setMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler

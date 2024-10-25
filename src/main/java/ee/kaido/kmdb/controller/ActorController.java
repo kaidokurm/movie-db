@@ -6,6 +6,8 @@ import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.ActorDTO;
 import ee.kaido.kmdb.model.MovieDTO;
 import ee.kaido.kmdb.service.ActorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +24,15 @@ public class ActorController {
         this.actorService = actorService;
     }
 
+    @Operation(summary = "Create a new actor",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "User  created successfully"),
+                    @ApiResponse(responseCode = "406", description = "Input not acceptable"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input")
+            })
     @PostMapping("")
-    public ResponseEntity<ActorDTO> createActor(@RequestBody Map<String, Object> data) throws ElementExistsException, BadRequestException, ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.createActor(data));
+    public ResponseEntity<ActorDTO> createActor(@RequestBody Map<String, Object> actor) throws ElementExistsException, BadRequestException, ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(actorService.createActor(actor));
     }
 
     @GetMapping({"", "/find"})

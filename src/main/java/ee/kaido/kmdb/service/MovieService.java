@@ -65,9 +65,9 @@ public class MovieService {
             actor = actorService.getActorByIdOrThrowError(actorId);
 
         //check if Pageable is ok
-        if(page!=null&&page>=0&&size!=null&&size>0) {
+        if (page != null && page >= 0 && size != null && size > 0) {
             return getFilteredMoviesPageable(releaseYear, title, page, size, genre, actor);
-        }else{
+        } else {
             //else get list without pageable
             return getMovieDTOS(releaseYear, title, genre, actor);
         }
@@ -164,15 +164,18 @@ public class MovieService {
         }
     }
 
-    public void deleteMovie(Long id) {
+    public void deleteMovie(Long id) throws ResourceNotFoundException {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        if (movie == null)
+            throw new ResourceNotFoundException("No movie found with id: " + id);
         movieRepository.deleteById(id);
     }
 
 
     private void validateMovieActors(Movie movie) {
-        List<Actor> actors=movie.getActors();
+        List<Actor> actors = movie.getActors();
         //find all actors by id
-        if (actors!=null&&!actors.isEmpty()) {
+        if (actors != null && !actors.isEmpty()) {
             List<Actor> newActors = movie.getActors().stream().map(actor -> {
                         try {
                             return actorService.getActorByIdOrThrowError(actor.getId());
@@ -201,7 +204,7 @@ public class MovieService {
 
     private void validateMovieTitle(Movie movie) {
         String title = movie.getTitle();
-        if (title==null|| title.trim().isEmpty()) {
+        if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Movie title cannot be empty");
         }
     }
