@@ -7,6 +7,7 @@ import ee.kaido.kmdb.model.Genre;
 import ee.kaido.kmdb.model.MovieDTO;
 import ee.kaido.kmdb.service.GenreService;
 import ee.kaido.kmdb.service.MovieService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +31,7 @@ public class GenreController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Genre> createGenre(@RequestBody Genre genre) throws ElementExistsException {
+    public ResponseEntity<Genre> createGenre(@Valid @RequestBody Genre genre) throws ElementExistsException {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 genreService.addGenre(genre));
     }

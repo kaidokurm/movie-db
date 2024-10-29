@@ -1,10 +1,11 @@
 package ee.kaido.kmdb.controller;
 
+import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.model.ActorDTO;
-import ee.kaido.kmdb.model.Movie;
 import ee.kaido.kmdb.model.MovieDTO;
 import ee.kaido.kmdb.service.MovieService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +24,9 @@ public class MovieController {
 
     @PostMapping
     public ResponseEntity<MovieDTO> addMovie(
-            @RequestBody Movie movie) {
+            @Valid @RequestBody MovieDTO movieDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                movieService.addMovie(movie));
+                movieService.addMovie(movieDTO));
     }
 
     @GetMapping("/{id}")
@@ -59,7 +60,7 @@ public class MovieController {
     public ResponseEntity<MovieDTO> updateMovie(
             @PathVariable long id,
             @RequestBody Map<String, Object> data)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, BadRequestException {
         return ResponseEntity.ok().body(
                 movieService.updateMovie(id, data));
     }

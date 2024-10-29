@@ -1,12 +1,13 @@
 package ee.kaido.kmdb.service.checkers;
 
+import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ElementExistsException;
 import ee.kaido.kmdb.repository.ActorRepository;
 
 public class Checks {
-    public static String checkIfStringNotEmpty(String text, String fieldName) {
+    public static String checkIfStringNotEmpty(String text, String fieldName) throws BadRequestException {
         if (text.trim().isEmpty())
-            throw new IllegalArgumentException(fieldName + " can't be empty!");
+            throw new BadRequestException(fieldName + " can't be empty!");
         return text;
     }
 

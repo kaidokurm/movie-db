@@ -26,13 +26,13 @@ import static ee.kaido.kmdb.service.checkers.Checks.checkIfStringNotEmpty;
 public class ActorService {
 
     private final ActorRepository actorRepository;
-    private final ObjectMapper mapper;
     private final MovieRepository movieRepository;
+    private final ObjectMapper mapper;
 
-    public ActorService(ActorRepository actorRepository, ObjectMapper mapper, MovieRepository movieRepository) {
+    public ActorService(ActorRepository actorRepository, MovieRepository movieRepository, ObjectMapper mapper) {
         this.actorRepository = actorRepository;
-        this.mapper = mapper;
         this.movieRepository = movieRepository;
+        this.mapper = mapper;
     }
 
     public ActorDTO createActor(Map<String, Object> data) throws ElementExistsException, BadRequestException, ResourceNotFoundException {
@@ -45,10 +45,10 @@ public class ActorService {
         return new ActorDTO(savedActor, true);
     }
 
-    public List<ActorDTO> getActorsByFilter(String name, boolean showMovies) {
+    public List<ActorDTO> getActorsByFilter(String name) {
         return actorRepository.findByNameContains(name)
                 .stream()
-                .map(actor -> new ActorDTO(actor, showMovies))
+                .map(actor -> new ActorDTO(actor, true))
                 .collect(Collectors.toList());
     }
 
@@ -86,40 +86,47 @@ public class ActorService {
     }
 
     private void updateActorFields(JsonNode jsonNode, Actor actor, boolean create) throws BadRequestException, ResourceNotFoundException {
-        updateName(jsonNode, actor);
-        updateBirthDate(jsonNode, actor);
-        updateMovies(jsonNode, actor, create);
+        actor.setName(updateName(jsonNode));
+        actor.setBirthDate(updateBirthDate(jsonNode));
+        actor.setMovies(updateMovies(jsonNode, actor, create));
     }
 
-    private void updateMovies(JsonNode jsonNode, Actor actor, boolean create) throws ResourceNotFoundException {
+    private List<Movie> updateMovies(JsonNode jsonNode, Actor actor, boolean create) throws ResourceNotFoundException {
+        List<Movie> movies = new ArrayList<>();
         if (jsonNode.has("movies")) {
-            List<Movie> movies = new ArrayList<>();
             JsonNode moviesJsonNode = jsonNode.get("movies");
-            if (!create) {
+            if (!create && actor != null) {
                 removeActorFromMovie(actor);
             }
             for (JsonNode movieJsonNode : moviesJsonNode) {
-                Long movieId = movieJsonNode.get("id").asLong();
+                long movieId;
+                if (movieJsonNode.has("id")) {
+                    movieId = movieJsonNode.get("id").asLong();
+                } else {//if its a list of longs
+                    movieId = movieJsonNode.asLong();
+                }
                 Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + movieId));
                 movies.add(movie);
                 movie.getActors().add(actor);
                 movieRepository.save(movie);
             }
-            actor.setMovies(movies);
         }
+        return movies;
     }
 
-    private static void updateBirthDate(JsonNode jsonNode, Actor actor) throws BadRequestException {
+    private static String updateBirthDate(JsonNode jsonNode) {
+        String birthdate = "";
         if (jsonNode.has("birthDate")) {
-            actor.setBirthDate(jsonNode.get("birthDate").asText());
+            birthdate = jsonNode.get("birthDate").asText();
         }
+        return birthdate;
     }
 
-    private static void updateName(JsonNode jsonNode, Actor actor) {
+    private static String updateName(JsonNode jsonNode) throws BadRequestException {
         if (jsonNode.has("name")) {
-            actor.setName(
-                    checkIfStringNotEmpty(jsonNode.get("name").asText(), "Actor name")
-            );
+            return checkIfStringNotEmpty(jsonNode.get("name").asText(), "Actor name");
+        } else {
+            throw new BadRequestException("Actor name is required.");
         }
     }
 

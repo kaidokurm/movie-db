@@ -18,7 +18,7 @@ import java.util.Optional;
 @Validated
 public class GenreService {
     private final GenreRepository genreRepository;
-    private final  MovieRepository movieRepository;
+    private final MovieRepository movieRepository;
 
     public GenreService(GenreRepository genreRepository, MovieRepository movieRepository) {
         this.genreRepository = genreRepository;
@@ -66,14 +66,14 @@ public class GenreService {
     }
 
     private void removeGenreFromMovies(Genre genre) {
-        List<Movie> movies = movieRepository.getMoviesByFilters ( genre, null, null, null);
+        List<Movie> movies = movieRepository.getMoviesByFilters(genre, null, null, null);
         movies.forEach((movie) -> movie.removeGenre(genre));
     }
 
     private void updateGenreName(Map<String, Object> updates, Genre genre) {
         if (updates.containsKey("name")) {
             String newName = (String) updates.get("name");
-            if(genreRepository.findByName(newName)!=null){
+            if (genreRepository.findByName(newName) != null) {
                 throw new IllegalArgumentException("Genre with name: '" + newName + "' already exists");
             }
             if (newName == null || newName.trim().isEmpty())
@@ -83,10 +83,12 @@ public class GenreService {
     }
 
     private void validateGenre(Genre genre) throws ElementExistsException {
-        if (genre.getId() != null && genreRepository.findById(genre.getId()).isPresent())
-            throw new ElementExistsException("Genre with id '" + genre.getId() + "' already exists");
-        if (genre.getName() == null || genre.getName().trim().isEmpty())
-            throw new IllegalArgumentException("Genre name is required");
+        if (genre.getId() != null)
+            genre.setId(null);
+        
+        if (genre.getName().trim().isEmpty())
+            throw new IllegalArgumentException("Genre name can not be only spaces");
+
         if (genreRepository.findByName(genre.getName()) != null)
             throw new ElementExistsException("Genre with name '" + genre.getName() + "' already exists");
     }

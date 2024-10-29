@@ -37,10 +37,9 @@ public class ActorController {
 
     @GetMapping({"", "/find"})
     public ResponseEntity<List<ActorDTO>> getActorsByFilter(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false, defaultValue = "true") boolean showMovies) {
+            @RequestParam(required = false) String name) {
         return ResponseEntity.ok().body(
-                actorService.getActorsByFilter(name, showMovies));
+                actorService.getActorsByFilter(name));
     }
 
 
