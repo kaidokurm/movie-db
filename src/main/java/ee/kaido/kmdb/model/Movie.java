@@ -1,12 +1,14 @@
 package ee.kaido.kmdb.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import ee.kaido.kmdb.deserializers.ActorListDeserializer;
 import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import ee.kaido.kmdb.deserializers.GenreListDeserializer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     private Set<Genre> genres = new HashSet<>();
-
+    @JsonDeserialize(using = ActorListDeserializer.class)
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "movie_actor",
@@ -56,18 +58,14 @@ public class Movie {
         this.setActors(actorList);
     }
 
+    @SneakyThrows
     public Movie(MovieDTO movieDto) {
         this.setTitle(movieDto.getTitle());
         this.setReleasedYear(movieDto.getReleasedYear());
         this.setDuration(movieDto.getDuration());
         this.setGenres(movieDto.getGenres());
     }
-
-
-    public void addActor(Actor actor) {
-        this.actors.add(actor);
-    }
-
+    
     public void removeActor(Actor actor) {
         this.getActors().remove(actor);
     }

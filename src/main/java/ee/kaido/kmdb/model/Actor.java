@@ -8,7 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.Instant;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,10 +36,11 @@ public class Actor {
     @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY)
     private List<Movie> movies;
 
-    public Actor(ActorDTO actorDTO) {
+    public Actor(ActorDTO actorDTO) throws ParseException {
         this.id = actorDTO.getId();
         this.name = actorDTO.getName();
-        this.birthDate = Date.from(Instant.parse(actorDTO.getBirthDate()));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        this.birthDate = formatter.parse(actorDTO.getBirthDate());
 //        this.movies = actorDTO.getMovies().stream().map(movieDTO -> new Movie(movieDTO)).collect(Collectors.toList());
     }
 

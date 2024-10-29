@@ -7,7 +7,6 @@ import ee.kaido.kmdb.controller.exception.BadRequestException;
 import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import ee.kaido.kmdb.model.*;
-import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,14 +25,12 @@ public class MovieService {
     private final GenreService genreService;
     private final ActorService actorService;
     private final ObjectMapper objectMapper;
-    private final ActorRepository actorRepository;
 
-    public MovieService(MovieRepository movieRepository, GenreService genreService, ActorService actorService, ObjectMapper objectMapper, ActorRepository actorRepository) {
+    public MovieService(MovieRepository movieRepository, GenreService genreService, ActorService actorService, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
         this.genreService = genreService;
         this.actorService = actorService;
         this.objectMapper = objectMapper;
-        this.actorRepository = actorRepository;
         registerDurationDeserializer();
     }
 
@@ -45,23 +42,28 @@ public class MovieService {
     }
 
     public MovieDTO addMovie(MovieDTO movieDto) {
-        Movie movie = new Movie();
-        if (movieDto.getActors() != null && !movieDto.getActors().isEmpty()) {
-            List<Actor> actors = movieDto.getActors().stream()
-                    .map(actorDTO -> {
-                        try {
-                            return actorRepository.findById(actorDTO.getId())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Actor not found"));
-                        } catch (ResourceNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .collect(Collectors.toList());
-            movie = new Movie(movieDto, actors);
-        } else movie = new Movie(movieDto);
+        Movie movie = new Movie(movieDto);
+
+        updateMovieActors(movieDto, movie);
+
         // Save and return movie with id
         Movie savedMovie = movieRepository.save(movie);
         return new MovieDTO(savedMovie, true);
+    }
+
+    private void updateMovieActors(MovieDTO movieDto, Movie movie) {
+        //update actors when there is actors in input
+        if (movieDto.getActors() != null && !movieDto.getActors().isEmpty()) {
+            List<Actor> actors = movieDto.getActors().stream().map(actorDto -> {
+                long actorId = actorDto.getId();
+                try {
+                    return actorService.getActorByIdOrThrowError(actorId);
+                } catch (ResourceNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+            movie.setActors(actors);
+        }
     }
 
 
@@ -124,23 +126,41 @@ public class MovieService {
         return new MovieDTO(movieRepository.save(movie), true);
     }
 
-    private void updateMovieFields(JsonNode jsonNode, Movie movie) throws ResourceNotFoundException, BadRequestException {
-        updateMovieTitle(jsonNode, movie);
-        updateMovieReleasedYear(jsonNode, movie);
-        updateMovieDuration(jsonNode, movie);
-        updateMovieGenres(jsonNode, movie);
-        updateMovieActors(jsonNode, movie);
+    private void updateMovieFields(JsonNode movieUpdateJson, Movie movie) throws ResourceNotFoundException, BadRequestException {
+        updateMovieTitle(movieUpdateJson, movie);
+        updateMovieReleasedYear(movieUpdateJson, movie);
+        updateMovieDuration(movieUpdateJson, movie);
+        updateMovieGenres(movieUpdateJson, movie);
+        updateJsonMovieActors(movieUpdateJson, movie);
     }
 
-    private void updateMovieActors(JsonNode jsonNode, Movie movie) throws ResourceNotFoundException {
+
+    public void deleteMovie(Long id) throws ResourceNotFoundException {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        if (movie == null)
+            throw new ResourceNotFoundException("No movie found with id: " + id);
+        movieRepository.deleteById(id);
+    }
+
+    public List<ActorDTO> getActorsInMovie(Long movieId) throws ResourceNotFoundException {
+        try {
+            Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + movieId));
+            return movie.getActors().stream().map(actor -> new ActorDTO(actor, false)).collect(Collectors.toList());
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("No actors found");
+        }
+    }
+
+    private void updateJsonMovieActors(JsonNode jsonNode, Movie movie) throws ResourceNotFoundException {
+        //update actors when there is actors in input
         if (jsonNode.has("actors")) {
-            List<Actor> actors = new ArrayList<>();
-            JsonNode actorsJsonNode = jsonNode.get("actors");
-            for (JsonNode actorJsonNode : actorsJsonNode) {
-                long actorId = actorJsonNode.get("id").asLong();
-                actors.add(actorService.getActorByIdOrThrowError(actorId));
+            List<Actor> actorList = new ArrayList<>();
+            JsonNode actors = jsonNode.get("actors");
+            for (JsonNode actor : actors) {
+                long actorId = actor.has("id") ? actor.get("id").asLong() : actor.asLong();
+                actorList.add(actorService.getActorByIdOrThrowError(actorId));
             }
-            movie.setActors(actors);
+            movie.setActors(actorList);
         }
     }
 
@@ -168,33 +188,17 @@ public class MovieService {
         }
     }
 
-    private static void updateMovieReleasedYear(JsonNode jsonNode, Movie movie) {
+    private void updateMovieReleasedYear(JsonNode jsonNode, Movie movie) {
         if (jsonNode.has("releasedYear")) {
             movie.setReleasedYear(jsonNode.get("releasedYear").asInt());
         }
     }
 
-    private static void updateMovieTitle(JsonNode jsonNode, Movie movie) throws BadRequestException {
+    private void updateMovieTitle(JsonNode jsonNode, Movie movie) throws BadRequestException {
         if (jsonNode.has("title")) {
             String title = jsonNode.get("title").asText();
             checkIfStringNotEmpty(title, "Movie title");
             movie.setTitle(title);
-        }
-    }
-
-    public void deleteMovie(Long id) throws ResourceNotFoundException {
-        Movie movie = movieRepository.findById(id).orElse(null);
-        if (movie == null)
-            throw new ResourceNotFoundException("No movie found with id: " + id);
-        movieRepository.deleteById(id);
-    }
-
-    public List<ActorDTO> getActorsInMovie(Long movieId) throws ResourceNotFoundException {
-        try {
-            Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("No movie found with id: " + movieId));
-            return movie.getActors().stream().map(actor -> new ActorDTO(actor, false)).collect(Collectors.toList());
-        } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException("No actors found");
         }
     }
 }
