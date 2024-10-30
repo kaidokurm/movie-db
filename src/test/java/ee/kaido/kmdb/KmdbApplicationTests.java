@@ -1,12 +1,20 @@
 package ee.kaido.kmdb;
 
+import ee.kaido.kmdb.dto.ActorDTO;
+import ee.kaido.kmdb.dto.MovieDTO;
 import ee.kaido.kmdb.entity.Actor;
 import ee.kaido.kmdb.entity.Genre;
 import ee.kaido.kmdb.entity.Movie;
 import ee.kaido.kmdb.exception.BadRequestException;
+import ee.kaido.kmdb.exception.ElementExistsException;
 import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.GenreRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
+import ee.kaido.kmdb.service.ActorService;
+import ee.kaido.kmdb.service.GenreService;
+import ee.kaido.kmdb.service.MovieService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,31 +37,46 @@ class KmdbApplicationTests {
 
     @Autowired
     private GenreRepository genreRepository;
+    @Autowired
+    private GenreService genreService;
+    @Autowired
+    private ActorService actorService;
+    @Autowired
+    private MovieService movieService;
 
-    @Test
-    void contextLoads() {
-        assertNotNull(movieRepository);
-        assertNotNull(actorRepository);
-        assertNotNull(genreRepository);
+
+    Movie movie = new Movie();
+    Actor actor = new Actor();
+    Genre actionGenre = new Genre();
+
+    @AfterEach
+    void closeUp() {
+        if (movie.getId() != null) {
+            movieRepository.deleteById(movie.getId());
+        }
+        if (actor.getId() != null) {
+            actorRepository.deleteById(actor.getId());
+        }
+        if (actionGenre.getId() != null) {
+            genreRepository.deleteById(actionGenre.getId());
+        }
     }
 
-    @Test
-    @Transactional
-    void testCreateAndRetrieveMovie() throws BadRequestException {
+    @BeforeEach
+    void setUp() throws BadRequestException, ElementExistsException {
         // Create genre
-        Genre actionGenre = new Genre();
-        actionGenre.setName("Action");
-        genreRepository.save(actionGenre);
-        System.out.println(actionGenre.getId());
+        actionGenre.setName("Test Action Genre");
+        Genre genre = genreService.addGenre(actionGenre);
+        System.out.println(genre.getName());
 
         // Create actor
-        Actor actor = new Actor();
         actor.setName("Test Actor");
         actor.setBirthDate("1980-01-01");
+        actorService.createActor(new ActorDTO(actor, false));
         actorRepository.save(actor);
+        System.out.println(actor.getName());
 
         // Create movie
-        Movie movie = new Movie();
         movie.setTitle("Test Movie");
         movie.setReleaseYear(2023);
         Duration duration = Duration.ofMinutes(120);
@@ -61,17 +84,24 @@ class KmdbApplicationTests {
         movie.setGenres(Set.of(actionGenre));
         movie.setActors(List.of(actor));
 
-        Movie savedMovie = movieRepository.save(movie);
+        movieRepository.save(movie);
+        System.out.println(movie.getTitle());
+    }
+
+    @Test
+    @Transactional
+    void testCreateAndRetrieveMovie() {
 
         // Retrieve and verify
-        Movie retrievedMovie = movieRepository.findById(savedMovie.getId()).orElse(null);
+        Movie retrievedMovie = movieRepository.findById(movie.getId()).orElse(null);
         assertNotNull(retrievedMovie);
         assertEquals("Test Movie", retrievedMovie.getTitle());
         assertEquals(2023, retrievedMovie.getReleaseYear());
         assertEquals(Duration.ofMinutes(120), retrievedMovie.getDuration());
         assertEquals(1, retrievedMovie.getGenres().size());
-//        assertEquals(actionGenre.getId(), retrievedMovie.getGenres().getId());
+        assertTrue(retrievedMovie.getGenres().contains(actionGenre));
         assertEquals(1, retrievedMovie.getActors().size());
+        assertTrue(retrievedMovie.getActors().contains(actor));
     }
 
     @Test
@@ -144,9 +174,9 @@ class KmdbApplicationTests {
     @Test
     @Transactional
     void testMovieValidation() {
-        Movie movie = new Movie();
+        MovieDTO movie = new MovieDTO();
         // Don't set required fields
-        assertThrows(Exception.class, () -> movieRepository.save(movie));
+        assertThrows(Exception.class, () -> movieService.createMovie(movie));
     }
 }
 

@@ -1,11 +1,19 @@
 package ee.kaido.kmdb;
 
+import ee.kaido.kmdb.dto.ActorDTO;
+import ee.kaido.kmdb.dto.MovieDTO;
 import ee.kaido.kmdb.entity.Actor;
 import ee.kaido.kmdb.entity.Genre;
 import ee.kaido.kmdb.entity.Movie;
+import ee.kaido.kmdb.exception.BadRequestException;
+import ee.kaido.kmdb.exception.ElementExistsException;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.repository.ActorRepository;
 import ee.kaido.kmdb.repository.GenreRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
+import ee.kaido.kmdb.service.ActorService;
+import ee.kaido.kmdb.service.GenreService;
+import ee.kaido.kmdb.service.MovieService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class KmdbDeleteTests {
@@ -30,87 +39,86 @@ class KmdbDeleteTests {
     @Autowired
     private GenreRepository genreRepository;
 
-    private Genre genre;
-    private Actor actor;
-    private Movie movie;
+    private Genre genre = new Genre();
+    private final Actor actor = new Actor();
+    private final Movie movie = new Movie();
+    private ActorDTO actorDTO = new ActorDTO();
+    private MovieDTO movieDTO = new MovieDTO();
+    @Autowired
+    private GenreService genreService;
+    @Autowired
+    private ActorService actorService;
+    @Autowired
+    private MovieService movieService;
+
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ElementExistsException, BadRequestException {
         // Create and save a genre
-        genre = new Genre();
         genre.setName("Action");
-        genreRepository.save(genre);
+        genre = genreService.addGenre(genre);
 
         // Create and save an actor
-        actor = new Actor();
         actor.setName("Test Actor");
-        actorRepository.save(actor);
+        actor.setBirthDate("1999-11-01");
+        actorDTO = new ActorDTO(actor, false);
+        actorDTO = actorService.createActor(actorDTO);
 
         // Create and save a movie
-        movie = new Movie();
         movie.setTitle("Test Movie");
         movie.setReleaseYear(2023);
         Duration duration = Duration.ofMinutes(120);
         movie.setDuration(duration);
-        movie.setGenres(Set.of(genre));
-        movie.setActors(List.of(actor));
-        movieRepository.save(movie);
+        movieDTO = new MovieDTO(movie, true);
+        movieDTO.setGenres(Set.of(genre));
+        movieDTO.setActors(List.of(actorDTO));
+        movieDTO = movieService.createMovie(movieDTO);
     }
 
     @Test
     @Transactional
     void testDeleteGenreNoForce() {
-        System.out.println(genre);
         // Attempt to delete the genre without force
-        genreRepository.deleteById(genre.getId());
-        System.out.println(genre);
-        // Verify that the genre is deleted
-        assertFalse(genreRepository.findById(genre.getId()).isPresent());
+        assertThrows(BadRequestException.class, () -> genreService.deleteGenre(genre.getId(), false));
+        assertThrows(ResourceNotFoundException.class, () -> genreService.deleteGenre(-9999999L, false));
     }
 
     @Test
     @Transactional
-    void testDeleteGenreForce() {
-        // Save the genre again to ensure it exists
-        genreRepository.save(genre);
-
-        // Now delete with force (assuming your repository supports this)
-        genreRepository.deleteById(genre.getId());
-
-        // Verify that the genre is deleted
-        assertFalse(genreRepository.findById(genre.getId()).isPresent());
-    }
-
-    @Test
-    @Transactional
-    void testDeleteActor() {
+    void testDeleteActorNoForce() {
         // Attempt to delete the actor
-        actorRepository.deleteById(actor.getId());
-
-        // Verify that the actor is deleted
-        assertFalse(actorRepository.findById(actor.getId()).isPresent());
+        assertThrows(BadRequestException.class, () -> actorService.deleteActor(actorDTO.getId(), false));
+        assertThrows(ResourceNotFoundException.class, () -> actorService.deleteActor(-9999999L, false));
     }
 
     @Test
     @Transactional
-    void testDeleteActorForce() {
-        // Save the actor again to ensure it exists
-        actorRepository.save(actor);
-
+    void testDeleteGenreForce() throws BadRequestException, ResourceNotFoundException {
         // Now delete with force (assuming your repository supports this)
-        actorRepository.deleteById(actor.getId());
+        genreService.deleteGenre(genre.getId(), true);
+
+        // Verify that the genre is deleted
+        assertFalse(genreRepository.findById(genre.getId()).isPresent());
+    }
+
+
+    @Test
+    @Transactional
+    void testDeleteActorForce() throws BadRequestException, ResourceNotFoundException {
+        // Now delete with force (assuming your repository supports this)
+        actorService.deleteActor(actorDTO.getId(), true);
 
         // Verify that the actor is deleted
-        assertFalse(actorRepository.findById(actor.getId()).isPresent());
+        assertFalse(actorRepository.findById(actorDTO.getId()).isPresent());
     }
 
     @Test
     @Transactional
-    void testDeleteMovie() {
+    void testDeleteMovie() throws ResourceNotFoundException {
         // Attempt to delete the movie
-        movieRepository.deleteById(movie.getId());
+        movieService.deleteMovie(movieDTO.getId());
 
         // Verify that the movie is deleted
-        assertFalse(movieRepository.findById(movie.getId()).isPresent());
+        assertFalse(movieRepository.findById(movieDTO.getId()).isPresent());
     }
 }

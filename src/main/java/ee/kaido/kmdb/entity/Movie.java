@@ -32,8 +32,7 @@ public class Movie {
     private Duration duration;
     @JsonDeserialize(using = GenreListDeserializer.class)
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "movie_genre",
+    @JoinTable(name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
@@ -54,8 +53,6 @@ public class Movie {
         this.setReleaseYear(movieDto.getReleaseYear());
         this.setDuration(movieDto.getDuration());
         this.setGenres(movieDto.getGenres());
-
-        // Convert List<Optional<Actor>> to List<Actor>
         this.setActors(actorList);
     }
 
@@ -69,9 +66,5 @@ public class Movie {
 
     public void removeActor(Actor actor) {
         this.getActors().remove(actor);
-    }
-
-    public void removeGenre(Genre genre) {
-        this.getGenres().remove(genre);
     }
 }

@@ -96,7 +96,7 @@ public class ActorService {
     public void deleteActor(Long id, boolean force) throws ResourceNotFoundException, BadRequestException {
         Actor actor = getActorByIdOrThrowError(id);
         if (!force) {
-            int movieCount = actor.getMovies().size();
+            int movieCount = movieRepository.getMoviesByFilters(null, null, actor, null).size();
             if (movieCount != 0)
                 throw new BadRequestException("Unable to delete actor '" + actor.getName() +
                         "' as they are associated with " + movieCount + " movie" +

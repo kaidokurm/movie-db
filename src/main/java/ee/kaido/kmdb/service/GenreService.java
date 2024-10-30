@@ -1,10 +1,9 @@
 package ee.kaido.kmdb.service;
 
+import ee.kaido.kmdb.entity.Genre;
 import ee.kaido.kmdb.exception.BadRequestException;
 import ee.kaido.kmdb.exception.ElementExistsException;
 import ee.kaido.kmdb.exception.ResourceNotFoundException;
-import ee.kaido.kmdb.entity.Genre;
-import ee.kaido.kmdb.entity.Movie;
 import ee.kaido.kmdb.repository.GenreRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.stereotype.Service;
@@ -61,14 +60,16 @@ public class GenreService {
                         + " associated movie"
                         + (movieCount > 1 ? "s" : ""));//if more then 1 add s
         }
-        removeGenreFromMovies(genre);
+//        removeGenreFromMovies(genre);
         genreRepository.deleteById(id);
     }
 
-    private void removeGenreFromMovies(Genre genre) {
-        List<Movie> movies = movieRepository.getMoviesByFilters(genre, null, null, null);
-        movies.forEach((movie) -> movie.removeGenre(genre));
-    }
+//    private void removeGenreFromMovies(Genre genre) {
+//        List<Movie> movies = movieRepository.getMoviesByFilters(genre, null, null, null);
+//        for (Movie movie : movies) {
+//            movie.removeGenre(genre);
+//        }
+//    }
 
     private void updateGenreName(Map<String, Object> updates, Genre genre) {
         if (updates.containsKey("name")) {
