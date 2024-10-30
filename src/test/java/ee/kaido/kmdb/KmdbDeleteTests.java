@@ -55,7 +55,7 @@ class KmdbDeleteTests {
     @BeforeEach
     void setUp() throws ElementExistsException, BadRequestException {
         // Create and save a genre
-        genre.setName("Action");
+        genre.setName("Test Action");
         genre = genreService.addGenre(genre);
 
         // Create and save an actor
