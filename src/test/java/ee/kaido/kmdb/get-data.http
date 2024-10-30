@@ -1,0 +1,43 @@
+### 1. Get Genres by name
+GET http://localhost:8080/api/genres?name=x
+
+### Get all genres
+GET http://localhost:8080/api/genres
+
+### Get Gerne by Id
+GET http://localhost:8080/api/genres/2
+
+### Get Gerne Movies by Id
+GET http://localhost:8080/api/genres/2/movies
+
+### Get Gerne Movies by Id with actor
+GET http://localhost:8080/api/genres/2/movies?showActors=true
+
+
+### 2. Get all Actors
+GET http://localhost:8080/api/actors?name=a
+
+### Get Actors by name
+GET http://localhost:8080/api/actors?name=a
+
+### Get Actors by name contains = a, hide movies and pagination
+GET http://localhost:8080/api/actors?name=a&page=0&size=10&showMovies=false
+
+### Get Actor by id
+GET http://localhost:8080/api/actors/2
+
+### Get Actor by name, hide movies and pagination
+GET http://localhost:8080/api/actors/2?showMovies=false
+
+### Get Actor Movies
+GET http://localhost:8080/api/actors/2/movies
+
+
+### 3. Get all Movies
+GET http://localhost:8080/api/movies
+
+### Get all Movies filtered
+GET http://localhost:8080/api/movies?genreId=2&releaseYear=2015&actorId=12&title=u&page=0&size=1&showActors=false
+
+### Get Movie Actors
+GET http://localhost:8080/api/movies/1/actors

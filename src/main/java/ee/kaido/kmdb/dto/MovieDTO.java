@@ -1,10 +1,14 @@
-package ee.kaido.kmdb.model;
+package ee.kaido.kmdb.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import ee.kaido.kmdb.deserializers.ActorListDeserializer;
 import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import ee.kaido.kmdb.deserializers.GenreListDeserializer;
+import ee.kaido.kmdb.entity.Actor;
+import ee.kaido.kmdb.entity.Genre;
+import ee.kaido.kmdb.entity.Movie;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -26,8 +30,8 @@ public class MovieDTO {
     @NotBlank(message = "Title is required")
     @Size(min = 2, message = "The title should have at least 2 characters")
     private String title;
-
-    private int releasedYear;
+    @Min(1900)
+    private int releaseYear;
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
 
@@ -43,7 +47,7 @@ public class MovieDTO {
         if (movie.getId() != null)
             this.id = movie.getId();
         this.title = movie.getTitle();
-        this.releasedYear = movie.getReleasedYear();
+        this.releaseYear = movie.getReleaseYear();
         this.duration = movie.getDuration();
         this.genres = movie.getGenres() == null ? null : movie.getGenres();
         if (actorVisible && movie.getActors() != null) {

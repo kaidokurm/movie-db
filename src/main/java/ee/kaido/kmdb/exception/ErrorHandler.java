@@ -1,4 +1,4 @@
-package ee.kaido.kmdb.controller.exception;
+package ee.kaido.kmdb.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.PropertyValueException;
@@ -14,7 +14,7 @@ import java.util.Date;
 
 @ControllerAdvice//adds to all controllers
 public class ErrorHandler {
-    @ExceptionHandler
+    @ExceptionHandler()
     public ResponseEntity<ExceptionResponseModel> handleException(IllegalArgumentException e) {
         return getExceptionResponseModelResponseEntity(e.getMessage());
     }

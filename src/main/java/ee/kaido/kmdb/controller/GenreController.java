@@ -1,12 +1,13 @@
 package ee.kaido.kmdb.controller;
 
-import ee.kaido.kmdb.controller.exception.BadRequestException;
-import ee.kaido.kmdb.controller.exception.ElementExistsException;
-import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
-import ee.kaido.kmdb.model.Genre;
-import ee.kaido.kmdb.model.MovieDTO;
+import ee.kaido.kmdb.dto.MovieDTO;
+import ee.kaido.kmdb.entity.Genre;
+import ee.kaido.kmdb.exception.BadRequestException;
+import ee.kaido.kmdb.exception.ElementExistsException;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.service.GenreService;
 import ee.kaido.kmdb.service.MovieService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class GenreController {
         this.movieService = movieService;
     }
 
+    @Transactional
     @PostMapping("")
     public ResponseEntity<Genre> createGenre(@Valid @RequestBody Genre genre) throws ElementExistsException {
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -49,17 +51,21 @@ public class GenreController {
     }
 
     @GetMapping("/{id}/movies")
-    public ResponseEntity<List<MovieDTO>> getGenreMovies(@PathVariable long id) throws ResourceNotFoundException {
+    public ResponseEntity<List<MovieDTO>> getGenreMovies(
+            @PathVariable long id,
+            @RequestParam(required = false, defaultValue = "false") boolean showActors) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(id, null, null, null, null, null));
+                movieService.getMoviesByFilter(id, null, null, null, null, null, showActors));
     }
 
+    @Transactional
     @PatchMapping("/{id}")
     public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody Map<String, Object> genre) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
                 genreService.updateGenre(id, genre));
     }
 
+    @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGenre(
             @PathVariable long id,

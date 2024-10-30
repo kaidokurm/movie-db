@@ -1,8 +1,10 @@
-package ee.kaido.kmdb.model;
+package ee.kaido.kmdb.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
+import ee.kaido.kmdb.entity.Actor;
+import ee.kaido.kmdb.entity.Movie;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.service.ActorService;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static ee.kaido.kmdb.deserializers.checkers.Checks.wordFirstLetterToHigh;
 
 // for actor returning
 @NoArgsConstructor
@@ -59,8 +63,7 @@ public class ActorDTO {
     }
 
     public ActorDTO(Long id, ActorService actorService) throws ResourceNotFoundException {
-        Actor actor =
-                actorService.getActorByIdOrThrowError(id);
+        Actor actor = actorService.getActorByIdOrThrowError(id);
         this.id = id;
         this.name = actor.getName();
         this.birthDate = String.valueOf(actor.getBirthDate());
@@ -68,5 +71,9 @@ public class ActorDTO {
         for (Movie movie : actor.getMovies()) {
             this.movies.add(new MovieDTO(movie, true));
         }
+    }
+
+    public void setName(@Size(min = 1, message = "Minimum name length is 1 character") @NotNull(message = "Name is required") String name) {
+        this.name = wordFirstLetterToHigh(name);
     }
 }

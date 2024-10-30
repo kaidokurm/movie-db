@@ -1,4 +1,4 @@
-package ee.kaido.kmdb.controller.exception;
+package ee.kaido.kmdb.exception;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,21 +1,24 @@
-package ee.kaido.kmdb.model;
+package ee.kaido.kmdb.entity;
 
 
-import ee.kaido.kmdb.controller.exception.BadRequestException;
+import ee.kaido.kmdb.dto.ActorDTO;
+import ee.kaido.kmdb.exception.BadRequestException;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
+
+import static ee.kaido.kmdb.deserializers.checkers.Checks.wordFirstLetterToHigh;
 
 @Data
 @AllArgsConstructor
@@ -36,19 +39,16 @@ public class Actor {
     @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY)
     private List<Movie> movies;
 
-    public Actor(ActorDTO actorDTO) throws ParseException {
+    public Actor(ActorDTO actorDTO) throws BadRequestException {
         this.id = actorDTO.getId();
         this.name = actorDTO.getName();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        this.birthDate = formatter.parse(actorDTO.getBirthDate());
-//        this.movies = actorDTO.getMovies().stream().map(movieDTO -> new Movie(movieDTO)).collect(Collectors.toList());
+        setBirthDate(actorDTO.getBirthDate());
     }
 
-    public void setName(String name) {
-        if (name.isBlank() || name.trim().isEmpty())
-            throw new IllegalArgumentException("Actor name cannot be blank or empty");
-        this.name = name;
+    public void setName(@Size(min = 1, message = "Minimum name length is 1 character") @NotNull(message = "Name is required") String name) {
+        this.name = wordFirstLetterToHigh(name);
     }
+
 
     public void setBirthDate(String date) throws BadRequestException {
         if (!date.isBlank() || !date.trim().isEmpty()) {

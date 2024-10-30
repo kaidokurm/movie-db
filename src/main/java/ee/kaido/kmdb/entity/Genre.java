@@ -1,4 +1,4 @@
-package ee.kaido.kmdb.model;
+package ee.kaido.kmdb.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

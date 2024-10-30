@@ -1,10 +1,10 @@
 package ee.kaido.kmdb.service;
 
-import ee.kaido.kmdb.controller.exception.BadRequestException;
-import ee.kaido.kmdb.controller.exception.ElementExistsException;
-import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
-import ee.kaido.kmdb.model.Genre;
-import ee.kaido.kmdb.model.Movie;
+import ee.kaido.kmdb.exception.BadRequestException;
+import ee.kaido.kmdb.exception.ElementExistsException;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
+import ee.kaido.kmdb.entity.Genre;
+import ee.kaido.kmdb.entity.Movie;
 import ee.kaido.kmdb.repository.GenreRepository;
 import ee.kaido.kmdb.repository.MovieRepository;
 import org.springframework.stereotype.Service;
@@ -85,7 +85,7 @@ public class GenreService {
     private void validateGenre(Genre genre) throws ElementExistsException {
         if (genre.getId() != null)
             genre.setId(null);
-        
+
         if (genre.getName().trim().isEmpty())
             throw new IllegalArgumentException("Genre name can not be only spaces");
 

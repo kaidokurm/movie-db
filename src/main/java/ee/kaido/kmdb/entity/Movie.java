@@ -1,9 +1,10 @@
-package ee.kaido.kmdb.model;
+package ee.kaido.kmdb.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import ee.kaido.kmdb.deserializers.ActorListDeserializer;
 import ee.kaido.kmdb.deserializers.DurationDeserializer;
 import ee.kaido.kmdb.deserializers.GenreListDeserializer;
+import ee.kaido.kmdb.dto.MovieDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class Movie {
     private Long id;
     @Column(nullable = false)
     private String title;
-    private int releasedYear;
+    private int releaseYear;
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
     @JsonDeserialize(using = GenreListDeserializer.class)
@@ -50,7 +51,7 @@ public class Movie {
     public Movie(MovieDTO movieDto, List<Actor> actorList) {
 
         this.setTitle(movieDto.getTitle());
-        this.setReleasedYear(movieDto.getReleasedYear());
+        this.setReleaseYear(movieDto.getReleaseYear());
         this.setDuration(movieDto.getDuration());
         this.setGenres(movieDto.getGenres());
 
@@ -61,11 +62,11 @@ public class Movie {
     @SneakyThrows
     public Movie(MovieDTO movieDto) {
         this.setTitle(movieDto.getTitle());
-        this.setReleasedYear(movieDto.getReleasedYear());
+        this.setReleaseYear(movieDto.getReleaseYear());
         this.setDuration(movieDto.getDuration());
         this.setGenres(movieDto.getGenres());
     }
-    
+
     public void removeActor(Actor actor) {
         this.getActors().remove(actor);
     }

@@ -1,10 +1,11 @@
 package ee.kaido.kmdb.controller;
 
-import ee.kaido.kmdb.controller.exception.BadRequestException;
-import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
-import ee.kaido.kmdb.model.ActorDTO;
-import ee.kaido.kmdb.model.MovieDTO;
+import ee.kaido.kmdb.dto.ActorDTO;
+import ee.kaido.kmdb.dto.MovieDTO;
+import ee.kaido.kmdb.exception.BadRequestException;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.service.MovieService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +23,21 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    @Transactional
     @PostMapping
     public ResponseEntity<MovieDTO> addMovie(
             @Valid @RequestBody MovieDTO movieDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                movieService.addMovie(movieDTO));
+                movieService.createMovie(movieDTO));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MovieDTO> getMovie(
-            @PathVariable long id) throws ResourceNotFoundException {
+    public ResponseEntity<MovieDTO> getMovieById(
+            @PathVariable long id,
+            @RequestParam(required = false, defaultValue = "true") boolean showActors
+    ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMovieById(id));
+                movieService.getMovieDtoById(id, showActors));
     }
 
     @GetMapping({"/search", ""})
@@ -43,10 +47,11 @@ public class MovieController {
             @RequestParam(required = false) Long actorId,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false, defaultValue = "true") boolean showActors
     ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(genreId, releaseYear, actorId, title, page, size));
+                movieService.getMoviesByFilter(genreId, releaseYear, actorId, title, page, size, showActors));
     }
 
     @GetMapping("/{movieId}/actors")
@@ -56,6 +61,7 @@ public class MovieController {
                 movieService.getActorsInMovie(movieId));
     }
 
+    @Transactional
     @PatchMapping("/{id}")
     public ResponseEntity<MovieDTO> updateMovie(
             @PathVariable long id,
@@ -65,6 +71,7 @@ public class MovieController {
                 movieService.updateMovie(id, data));
     }
 
+    @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(
             @PathVariable long id) throws ResourceNotFoundException {

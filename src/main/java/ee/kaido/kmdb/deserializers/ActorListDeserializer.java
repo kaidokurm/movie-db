@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import ee.kaido.kmdb.controller.exception.ResourceNotFoundException;
-import ee.kaido.kmdb.model.ActorDTO;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
+import ee.kaido.kmdb.dto.ActorDTO;
 import ee.kaido.kmdb.service.ActorService;
 
 import java.io.IOException;

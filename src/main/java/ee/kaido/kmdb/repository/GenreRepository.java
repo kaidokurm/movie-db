@@ -1,6 +1,6 @@
 package ee.kaido.kmdb.repository;
 
-import ee.kaido.kmdb.model.Genre;
+import ee.kaido.kmdb.entity.Genre;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
