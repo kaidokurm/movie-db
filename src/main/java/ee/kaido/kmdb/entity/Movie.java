@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -31,14 +30,19 @@ public class Movie {
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
     @JsonDeserialize(using = GenreListDeserializer.class)
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.LAZY)
     @JoinTable(name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     private Set<Genre> genres = new HashSet<>();
     @JsonDeserialize(using = ActorListDeserializer.class)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.DETACH,
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.REFRESH})
     @JoinTable(
             name = "movie_actor",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
@@ -48,7 +52,6 @@ public class Movie {
 
 
     public Movie(MovieDTO movieDto, List<Actor> actorList) {
-
         this.setTitle(movieDto.getTitle());
         this.setReleaseYear(movieDto.getReleaseYear());
         this.setDuration(movieDto.getDuration());
@@ -56,7 +59,6 @@ public class Movie {
         this.setActors(actorList);
     }
 
-    @SneakyThrows
     public Movie(MovieDTO movieDto) {
         this.setTitle(movieDto.getTitle());
         this.setReleaseYear(movieDto.getReleaseYear());
@@ -66,5 +68,9 @@ public class Movie {
 
     public void removeActor(Actor actor) {
         this.getActors().remove(actor);
+    }
+
+    public void removeGenre(Genre genre) {
+        this.getGenres().remove(genre);
     }
 }

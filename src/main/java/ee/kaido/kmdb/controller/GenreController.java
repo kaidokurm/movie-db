@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Validated
 @RestController
@@ -33,34 +32,49 @@ public class GenreController {
 
     @Transactional
     @PostMapping("")
-    public ResponseEntity<Genre> createGenre(@Valid @RequestBody Genre genre) throws ElementExistsException {
+    public ResponseEntity<Genre> createGenre(@Valid @RequestBody Genre genre)
+            throws ElementExistsException {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                genreService.addGenre(genre));
+                genreService.createGenre(genre));
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Genre>> getAllGenres(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<Genre>> getAllGenres(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) throws BadRequestException {
         return ResponseEntity.ok().body(
-                genreService.getAllGenresByName(name));
+                genreService.getAllGenresByName(name, page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Genre>> getGenreById(@PathVariable long id) {
+    public ResponseEntity<Genre> getGenreById(@PathVariable long id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                genreService.getGenreById(id));
+                genreService.getGenreByIdOrThrowError(id));
     }
 
     @GetMapping("/{id}/movies")
     public ResponseEntity<List<MovieDTO>> getGenreMovies(
             @PathVariable long id,
-            @RequestParam(required = false, defaultValue = "false") boolean showActors) throws ResourceNotFoundException {
+            @RequestParam(required = false, defaultValue = "false") boolean hideActor)
+            throws ResourceNotFoundException, BadRequestException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(id, null, null, null, null, null, showActors));
+                movieService.getMoviesByFilter(
+                        id,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        hideActor));
     }
 
     @Transactional
     @PatchMapping("/{id}")
-    public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody Map<String, Object> genre) throws ResourceNotFoundException {
+    public ResponseEntity<Genre> updateGenre(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> genre
+    ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
                 genreService.updateGenre(id, genre));
     }

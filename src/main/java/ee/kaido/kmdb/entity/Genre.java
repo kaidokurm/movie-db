@@ -19,6 +19,7 @@ public class Genre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull(message = "Name is required")
-    @Size(min = 2, max = 100, message = "Minimum name size is 2 characters and maximum is 100 characters")
+    @Size(min = 2, max = 100,
+            message = "Minimum name size is 2 characters and maximum is 100 characters")
     private String name;
 }

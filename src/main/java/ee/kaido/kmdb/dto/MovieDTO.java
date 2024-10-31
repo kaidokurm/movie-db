@@ -28,9 +28,9 @@ public class MovieDTO {
     private Long id;
 
     @NotBlank(message = "Title is required")
-    @Size(min = 2, message = "The title should have at least 2 characters")
+    @Size(min = 1, message = "The title should have at least 1 characters")
     private String title;
-    @Min(1900)
+    @Min(value = 1800, message = "Minimum year is 1800")
     private int releaseYear;
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
@@ -43,17 +43,19 @@ public class MovieDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ActorDTO> actors;
 
-    public MovieDTO(Movie movie, boolean actorVisible) {
+
+    //Constructor
+    public MovieDTO(Movie movie, boolean hideActors) {
         if (movie.getId() != null)
             this.id = movie.getId();
         this.title = movie.getTitle();
         this.releaseYear = movie.getReleaseYear();
         this.duration = movie.getDuration();
         this.genres = movie.getGenres() == null ? null : movie.getGenres();
-        if (actorVisible && movie.getActors() != null) {
+        if (!hideActors && movie.getActors() != null) {
             List<ActorDTO> actors = new ArrayList<>();
             for (Actor actor : movie.getActors()) {
-                actors.add(new ActorDTO(actor, false));
+                actors.add(new ActorDTO(actor, true));
             }
             this.actors = actors;
         }

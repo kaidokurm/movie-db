@@ -1,6 +1,7 @@
 package ee.kaido.kmdb.repository;
 
 import ee.kaido.kmdb.entity.Genre;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,4 +13,7 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
 
     @Query("SELECT g FROM Genre g WHERE (:name IS NULL OR LOWER(g.name) LIKE %:name%)")
     List<Genre> findAllByName(@Param("name") String name);
+
+    @Query("SELECT g FROM Genre g WHERE (:name IS NULL OR LOWER(g.name) LIKE %:name%)")
+    List<Genre> findAllByNamePageable(@Param("name") String name, Pageable pageable);
 }

@@ -18,7 +18,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
 
-import static ee.kaido.kmdb.deserializers.checkers.Checks.wordFirstLetterToHigh;
+import static ee.kaido.kmdb.deserializers.checkers.Checks.wordFirstLetterToUpper;
 
 @Data
 @AllArgsConstructor
@@ -39,16 +39,20 @@ public class Actor {
     @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY)
     private List<Movie> movies;
 
+
     public Actor(ActorDTO actorDTO) throws BadRequestException {
         this.id = actorDTO.getId();
+
         this.name = actorDTO.getName();
+
         setBirthDate(actorDTO.getBirthDate());
     }
 
-    public void setName(@Size(min = 1, message = "Minimum name length is 1 character") @NotNull(message = "Name is required") String name) {
-        this.name = wordFirstLetterToHigh(name);
-    }
 
+    public void setName(@Size(min = 1, message = "Minimum name length is 1 character")
+                        @NotNull(message = "Name is required") String name) {
+        this.name = wordFirstLetterToUpper(name);
+    }
 
     public void setBirthDate(String date) throws BadRequestException {
         if (!date.isBlank() || !date.trim().isEmpty()) {

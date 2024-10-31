@@ -39,7 +39,7 @@ public class ActorService {
         List<Movie> movies = new ArrayList<>();
         setActorMovies(actorDTO, actor, movies);
         Actor savedActor = actorRepository.save(actor);
-        return new ActorDTO(savedActor, true);
+        return new ActorDTO(savedActor, false);
     }
 
     private void setActorMovies(ActorDTO actorDTO, Actor actor, List<Movie> movies) {
@@ -58,39 +58,43 @@ public class ActorService {
         }
     }
 
-    public List<ActorDTO> getActorsByFilter(String name, Integer page, Integer size, Boolean showMovies) {
+    public List<ActorDTO> getActorsByFilter(String name, Integer page, Integer size, Boolean hideMovies) throws BadRequestException {
         //check if Pageable is ok
-        if (page != null && page >= 0 && size != null && size > 0) {
-            Pageable pageable = PageRequest.of(page, size);
-            return actorRepository
-                    .findByNameContainsPageable(name, pageable)
-                    .stream()
-                    .map(actor -> new ActorDTO(actor, showMovies))
-                    .collect(Collectors.toList());
+        if (page != null && size != null) {
+            if (page >= 0 && size > 0 && size <= 200) {
+                Pageable pageable = PageRequest.of(page, size);
+                return actorRepository
+                        .findByNameContainsPageable(name, pageable)
+                        .stream()
+                        .map(actor -> new ActorDTO(actor, hideMovies))
+                        .collect(Collectors.toList());
+            } else {
+                throw new BadRequestException("Page must be at least 0 and size must be between 0 and 200");
+            }
         } else {
             //else get list without pageable
             return actorRepository
                     .findByNameContains(name)
                     .stream()
-                    .map(actor -> new ActorDTO(actor, showMovies))
+                    .map(actor -> new ActorDTO(actor, hideMovies))
                     .collect(Collectors.toList());
         }
     }
 
-    public ActorDTO findActorDtoById(long id, boolean showMovies) throws ResourceNotFoundException {
-        return new ActorDTO(getActorByIdOrThrowError(id), showMovies);
+    public ActorDTO findActorDtoById(long id, boolean hideMovies) throws ResourceNotFoundException {
+        return new ActorDTO(getActorByIdOrThrowError(id), hideMovies);
     }
 
     public Actor getActorByIdOrThrowError(long id) throws ResourceNotFoundException {
         return actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No actor found with id: " + id));
     }
 
-    public ActorDTO updateActor(Long id, Map<String, Object> data, boolean showMovies) throws ResourceNotFoundException, BadRequestException {
+    public ActorDTO updateActor(Long id, Map<String, Object> data, boolean hideMovies) throws ResourceNotFoundException, BadRequestException {
         Actor actor = getActorByIdOrThrowError(id);
         JsonNode jsonNode = mapper.convertValue(data, JsonNode.class);
         updateActorFields(jsonNode, actor);
         Actor savedActor = actorRepository.save(actor);
-        return new ActorDTO(savedActor, showMovies);
+        return new ActorDTO(savedActor, hideMovies);
     }
 
     public void deleteActor(Long id, boolean force) throws ResourceNotFoundException, BadRequestException {
@@ -102,6 +106,7 @@ public class ActorService {
                         "' as they are associated with " + movieCount + " movie" +
                         (movieCount > 1 ? "s" : ""));
         }
+        removeActorFromMovies(actor);
         actorRepository.deleteById(id);
     }
 

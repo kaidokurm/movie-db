@@ -16,77 +16,52 @@ import java.util.Date;
 public class ErrorHandler {
     @ExceptionHandler()
     public ResponseEntity<ExceptionResponseModel> handleException(IllegalArgumentException e) {
-        return getExceptionResponseModelResponseEntity(e.getMessage());
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(ElementExistsException e) {
-        return getExceptionResponseModelResponseEntity(e.getMessage());
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(PropertyValueException e) {
-        return getExceptionResponseModelResponseEntity(e.getMessage());
-    }
-
-    private ResponseEntity<ExceptionResponseModel> getExceptionResponseModelResponseEntity(String message) {
-        ExceptionResponseModel response = new ExceptionResponseModel();
-        response.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
-        response.setHttpStatusCode(HttpStatus.NOT_ACCEPTABLE.value());
-        response.setTimestamp(new Date());
-        response.setMessage(message);
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(IllegalStateException e) {
-        ExceptionResponseModel response = new ExceptionResponseModel();
-        response.setHttpStatus(HttpStatus.BAD_REQUEST);
-        response.setHttpStatusCode(HttpStatus.BAD_REQUEST.value());
-        response.setTimestamp(new Date());
-        response.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(EntityNotFoundException e) {
-        ExceptionResponseModel response = new ExceptionResponseModel();
-        response.setHttpStatus(HttpStatus.NOT_FOUND);
-        response.setHttpStatusCode(HttpStatus.NOT_FOUND.value());
-        response.setTimestamp(new Date());
-        response.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(ResourceNotFoundException e) {
-        ExceptionResponseModel response = new ExceptionResponseModel();
-        response.setHttpStatus(HttpStatus.NOT_FOUND);
-        response.setHttpStatusCode(HttpStatus.NOT_FOUND.value());
-        response.setTimestamp(new Date());
-        response.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(HttpMessageNotReadableException e) {
-        ExceptionResponseModel response = new ExceptionResponseModel();
-        response.setHttpStatus(HttpStatus.BAD_REQUEST);
-        response.setHttpStatusCode(HttpStatus.BAD_REQUEST.value());
-        response.setTimestamp(new Date());
-        response.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(BadRequestException e) {
+        return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    private static ResponseEntity<ExceptionResponseModel> getBadRequestExceptionResponseModelResponseEntity(HttpStatus badRequest, String message) {
         ExceptionResponseModel response = new ExceptionResponseModel();
-        response.setHttpStatus(HttpStatus.BAD_REQUEST);
-        response.setHttpStatusCode(HttpStatus.BAD_REQUEST.value());
+        response.setHttpStatus(badRequest);
+        response.setHttpStatusCode(badRequest.value());
         response.setTimestamp(new Date());
-        response.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        response.setMessage(message);
+        return ResponseEntity.status(badRequest).body(response);
     }
 
     //for validation errors

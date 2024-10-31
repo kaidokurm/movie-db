@@ -34,31 +34,33 @@ public class MovieController {
     @GetMapping("/{id}")
     public ResponseEntity<MovieDTO> getMovieById(
             @PathVariable long id,
-            @RequestParam(required = false, defaultValue = "true") boolean showActors
+            @RequestParam(required = false, defaultValue = "false") boolean hideActors
     ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getMovieDtoById(id, showActors));
+                movieService.getMovieDtoById(id, hideActors));
     }
 
     @GetMapping({"/search", ""})
     public ResponseEntity<List<MovieDTO>> getMoviesByFilter(
-            @RequestParam(required = false) Long genreId,
-            @RequestParam(required = false) Integer releaseYear,
-            @RequestParam(required = false) Long actorId,
+            @RequestParam(required = false) Long genre,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Long actor,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
-            @RequestParam(required = false, defaultValue = "true") boolean showActors
-    ) throws ResourceNotFoundException {
+            @RequestParam(required = false, defaultValue = "false") boolean hideActors
+    ) throws ResourceNotFoundException, BadRequestException {
         return ResponseEntity.ok().body(
-                movieService.getMoviesByFilter(genreId, releaseYear, actorId, title, page, size, showActors));
+                movieService.getMoviesByFilter(genre, year, actor, title, page, size, hideActors));
     }
 
     @GetMapping("/{movieId}/actors")
     public ResponseEntity<List<ActorDTO>> getActorsByMovie(
-            @PathVariable long movieId) throws ResourceNotFoundException {
+            @PathVariable long movieId,
+            @RequestParam(required = false) boolean hideMovies
+    ) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(
-                movieService.getActorsInMovie(movieId));
+                movieService.getActorsInMovie(movieId, hideMovies));
     }
 
     @Transactional

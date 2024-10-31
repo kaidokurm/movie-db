@@ -33,7 +33,8 @@ public class ActorController {
                     @ApiResponse(responseCode = "400", description = "Invalid input")
             })
     @PostMapping("")
-    public ResponseEntity<ActorDTO> createActor(@Valid @RequestBody ActorDTO actor) throws BadRequestException {
+    public ResponseEntity<ActorDTO> createActor(@Valid @RequestBody ActorDTO actor)
+            throws BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED).body(actorService.createActor(actor));
     }
 
@@ -42,21 +43,20 @@ public class ActorController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
-            @RequestParam(required = false, defaultValue = "true") Boolean showMovies
-    ) {
+            @RequestParam(required = false, defaultValue = "false") Boolean hideMovies
+    ) throws BadRequestException {
         return ResponseEntity.ok().body(
-                actorService.getActorsByFilter(name, page, size, showMovies));
+                actorService.getActorsByFilter(name, page, size, hideMovies));
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<ActorDTO> getActorById(
             @PathVariable long id,
-            @RequestParam(required = false, defaultValue = "true") boolean showMovies)
+            @RequestParam(required = false, defaultValue = "false") boolean hideMovies)
             throws ResourceNotFoundException {
-        System.out.println("getMappingId");
         return ResponseEntity.ok().body(
-                actorService.findActorDtoById(id, showMovies));
+                actorService.findActorDtoById(id, hideMovies));
     }
 
     @GetMapping("/{id}/movies")
@@ -71,10 +71,10 @@ public class ActorController {
     public ResponseEntity<ActorDTO> updateActor(
             @PathVariable long id,
             @RequestBody Map<String, Object> data,
-            @RequestParam(required = false, defaultValue = "true") boolean showMovies)
+            @RequestParam(required = false, defaultValue = "false") boolean hideMovies)
             throws ResourceNotFoundException, BadRequestException {
         return ResponseEntity.ok().body(
-                actorService.updateActor(id, data, showMovies));
+                actorService.updateActor(id, data, hideMovies));
     }
 
     @Transactional

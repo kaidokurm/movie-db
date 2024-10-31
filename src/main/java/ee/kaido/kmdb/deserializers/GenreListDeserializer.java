@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import ee.kaido.kmdb.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.entity.Genre;
+import ee.kaido.kmdb.exception.ResourceNotFoundException;
 import ee.kaido.kmdb.service.GenreService;
 
 import java.io.IOException;
@@ -28,7 +28,9 @@ public class GenreListDeserializer extends JsonDeserializer<Set<Genre>> {
         if (node.isArray()) {
             for (JsonNode jsonNode : node) {
                 //Check if its list of ids or actors
-                Long genreIds = jsonNode.has("id") ? jsonNode.get("id").asLong() : jsonNode.asLong();
+                Long genreIds = jsonNode.has("id")
+                        ? jsonNode.get("id").asLong()
+                        : jsonNode.asLong();
                 try {
                     genres.add(genreService.getGenreByIdOrThrowError(genreIds));
                 } catch (ResourceNotFoundException e) {

@@ -59,6 +59,10 @@ mvn spring-boot:run
 The application will start on http://localhost:8080.
 For more documentation go to http://localhost:8080/swagger-ui/index.html
 
+For Postman is a ***Movie Database API.postman_collection.json*** file.
+
+When needed to aad data run ***add_data.http***
+
 # Usage
 
 ## Genre API Endpoints
