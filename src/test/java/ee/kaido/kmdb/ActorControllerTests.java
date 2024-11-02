@@ -106,6 +106,7 @@ class ActorControllerTests {
     @Transactional
     void testGetActorMovies() throws ResourceNotFoundException, BadRequestException {
         MovieDTO movie = new MovieDTO(1L, "Movie", 1982, null, null, null);
+        movieRepository.save(new Movie(movie));
         List<MovieDTO> movieList = new ArrayList<>();
         movieList.add(movie);
         ActorDTO actorDTO = new ActorDTO(null, "Actor Test", "2000-01-01", movieList);
@@ -142,8 +143,6 @@ class ActorControllerTests {
         actorController.deleteActor(actor.getId(), true);
 
         // Verify that the actor has been deleted
-        assertThrows(ResourceNotFoundException.class, () -> {
-            actorController.getActorById(actor.getId(), true);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> actorController.getActorById(actor.getId(), true));
     }
 }

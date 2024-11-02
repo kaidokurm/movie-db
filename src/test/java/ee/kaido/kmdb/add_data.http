@@ -1,6 +1,7 @@
-### First, create genres
+#new Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI### First, create genres
 POST http://localhost:8080/api/genres
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Action"
@@ -9,6 +10,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/genres
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Science Fiction"
@@ -17,6 +19,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/genres
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Drama"
@@ -25,6 +28,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/genres
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Comedy"
@@ -33,6 +37,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/genres
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Thriller"
@@ -41,6 +46,7 @@ Content-Type: application/json
 ### Now create actors
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "tom hanks",
@@ -50,6 +56,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Morgan Freeman",
@@ -59,6 +66,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Leonardo DiCaprio",
@@ -68,6 +76,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Scarlett Johansson",
@@ -77,6 +86,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Robert Downey Jr.",
@@ -86,6 +96,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Emma Stone",
@@ -95,6 +106,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Brad Pitt",
@@ -104,6 +116,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Anne Hathaway",
@@ -113,6 +126,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Chris Evans",
@@ -122,6 +136,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Samuel L. Jackson",
@@ -131,6 +146,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Sandra Bullock",
@@ -140,6 +156,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Chris Pratt",
@@ -149,6 +166,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Meryl Streep",
@@ -158,6 +176,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Tom Cruise",
@@ -167,6 +186,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/actors
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "name": "Jennifer Lawrence",
@@ -176,6 +196,7 @@ Content-Type: application/json
 ### Now create movies
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Inception",
@@ -198,6 +219,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "The Avengers",
@@ -230,6 +252,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Forrest Gump",
@@ -252,6 +275,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "La La Land",
@@ -276,6 +300,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Fight Club",
@@ -300,6 +325,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Interstellar",
@@ -326,6 +352,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Mission: Impossible - Fallout",
@@ -350,6 +377,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "The Devil Wears Prada",
@@ -376,6 +404,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Gravity",
@@ -400,6 +429,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Jurassic World",
@@ -424,6 +454,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "The Post",
@@ -450,6 +481,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Top Gun: Maverick",
@@ -472,6 +504,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Silver Linings Playbook",
@@ -496,6 +529,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Cast Away",
@@ -518,6 +552,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Lucy",
@@ -544,6 +579,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "The Dark Knight",
@@ -570,6 +606,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Iron Man",
@@ -594,6 +631,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "The Hunger Games",
@@ -621,6 +659,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "Guardians of the Galaxy",
@@ -650,6 +689,7 @@ Content-Type: application/json
 ###
 POST http://localhost:8080/api/movies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTczMDU2Njk3MiwiZXhwIjoxNzMwNjUzMzcyfQ.235jGCMHIEIPWOg2IHC_zMZEQ3Ku-NIrt6WTV9vI1PI
 
 {
   "title": "The Proposal",

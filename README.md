@@ -19,6 +19,7 @@ to perform CRUD operations on movies, actors, and genres.
 - **Genre Management**: Create, read, update, and delete genres.
 - **Movie Management**: Create, read, update, and delete movies.
 - **Filtering**: Filter actors and movies by various criteria.
+- **Security Management**: User registration, authentication, token refresh functionality
 
 ## Technologies Used
 
@@ -27,6 +28,7 @@ to perform CRUD operations on movies, actors, and genres.
 - **Spring Data JPA**
 - **SQLite**: For persistent database storage.
 - **Lombok**: For reducing boilerplate code.
+- **Jakarta Servlet**:
 
 ## Setup Instructions
 
@@ -59,9 +61,11 @@ mvn spring-boot:run
 The application will start on http://localhost:8080.
 For more documentation go to http://localhost:8080/swagger-ui/index.html
 
-For Postman is a ***Movie Database API.postman_collection.json*** file.
+For Postman is a ***Movie Database API.postman_collection.json*** file in resources folder.
+***Import it after the program has started***
+For testing purpose the application creates admin and manager user and changes the Postman files tokens.
 
-When needed to aad data run ***add_data.http***
+When needed to add data run ***add_data.http***
 
 # Usage
 
@@ -183,7 +187,7 @@ read, update, and delete actors to maintain a comprehensive database of individu
     {
       "name": "Actor Name",
       "birthdate": "yyyy-MM-dd",
-      "movies": [{"id": 1 },{"id": 2}] or [1,2]
+      "movies": [{"id": 1 }, 2]
     }
     ```
 - **Response**:
@@ -247,14 +251,14 @@ read, update, and delete actors to maintain a comprehensive database of individu
     {
       "name": "Updated Actor Name",
       "birthdate": "YYYY-MM-DD",
-      "movies": [{Updated movie 1},{Updated movie 2}...] or [1,2]
+      "movies": [ 1, 2]
     }
     ```
 - **Response**:
     - **200 OK** with the updated actor details.
     - **400 Bad Request** wrong input.
     - **404 Not Found** if the actor does not exist.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X PATCH http://localhost:8080/api/actor/1 \
   -H "Content-Type: application/json" \
@@ -270,7 +274,7 @@ read, update, and delete actors to maintain a comprehensive database of individu
     - **204 No Content** if the actor was successfully deleted.
     - **400 Bad Request** if force is false and there exist associated movies
     - **404 Not Found** if the actor does not exist.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X DELETE http://localhost:8080/api/actor/1
   ```
@@ -288,16 +292,14 @@ read, update, and delete movies, as well as manage their associated actors and g
 
 - **Method**: `POST`
 - **Endpoint**: `/api/movies`
-- **Request Body**:
+- **Request Body:**
     ```json
     {
       "title": "Movie Title",
       "releaseYear": 2023,
       "duration": "PT1H10M or 70 or 01:10",
-      "genres": [{"id": 1},{"id": 2},
-                or 3,4],
-      "actors": [{"id": 1},{"id": 2},
-                or 1,2]
+      "genres": [{"id": 1},{"id": 2}],
+      "actors": [{"id": 1},{"id": 2}]
     }
     ```
 
@@ -305,7 +307,7 @@ read, update, and delete movies, as well as manage their associated actors and g
     - **201 Created** with Movie details.
     - **400 Bad Request**
     - **404 Not Found** if actor or genre does not exist.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X POST http://localhost:8080/api/movies \
   -H "Content-Type: application/json" \
@@ -321,7 +323,7 @@ read, update, and delete movies, as well as manage their associated actors and g
 - **Response**:
     - **200 OK** with Movie details.
     - **404 Not Found** no Movie found.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X GET http://localhost:8080/api/movies/1
   ```
@@ -344,7 +346,7 @@ read, update, and delete movies, as well as manage their associated actors and g
 - **Response**:
     - **200 OK** with a list of MovieDTO.
     - **404 Not Found** if actor or genre does not exist.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X GET http://localhost:8080/api/movies
   ```
@@ -356,7 +358,7 @@ read, update, and delete movies, as well as manage their associated actors and g
 - **Response**:
     - **200 OK** with a list of ActorDTO.
     - **404 Not Found** if movie does not exist.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X GET http://localhost:8080/api/movies/1/actors
   ```
@@ -392,7 +394,7 @@ read, update, and delete movies, as well as manage their associated actors and g
     - **200 OK** with updated Movie details.
     - **400 Bad Request** error in input
     - **404 Not Found** no data found
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X PUT http://localhost:8080/api/movies/1 \
   -H "Content-Type: application/json" \
@@ -406,7 +408,68 @@ read, update, and delete movies, as well as manage their associated actors and g
 - **Response**:
     - **204 No Content** if the movie was successfully deleted.
     - **404 Not Found** if movie does not exist.
-- **Example Curl Command**:
+- **Example Curl Command:**
   ```bash
   curl -X DELETE http://localhost:8080/api/movies/1
   ```
+
+# Security API Endpoints
+
+## Overview
+
+This is a simple authentication service built using Spring Boot. It provides endpoints for user registration,
+authentication, and token refreshing.
+
+## API Endpoints
+
+### 1. Register a User
+
+- **Endpoint:** `/api/auth/register`
+- **Method:** `POST`
+- **Request Body:**
+    ```json
+    {
+        "username": "string",
+        "password": "string",
+        "email": "string"
+    }
+    ```
+- **Response:**
+    - Returns an `AuthenticationResponse` object containing user details and tokens.
+- **Example Curl Command:**
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d '{"username":"testuser", "password":"password", "email":"test@example.com"}'
+```
+
+### 2. Authenticate a User
+
+- **Endpoint:** `/api/auth/authenticate`
+- **Method:** `POST`
+- **Request Body:**
+    ```json
+    {
+        "username": "string",
+        "password": "string"
+    }
+    ```
+- **Response:**
+    - Returns an `AuthenticationResponse` object containing user details and tokens.
+- **Example Curl Command:**
+
+```bash
+curl -X POST http://localhost:8080/api/auth/authenticate -H "Content-Type: application/json" -d '{"username":"testuser", "password":"password"}'
+```
+
+### 3. Refresh Token
+
+- **Endpoint:** `/api/auth/refresh-token`
+- **Method:** `POST`
+- **Request:** Requires the current JWT token in the request header.
+- **Response:**
+    - Updates the token and returns a new token.
+- **Example Curl Command:**
+
+```bash
+curl -X POST http://localhost:8080/api/auth/refresh-token -H "Authorization: Bearer <your_jwt_token>"
+```
