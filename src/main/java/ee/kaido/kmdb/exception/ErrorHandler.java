@@ -14,7 +14,8 @@ import java.util.Date;
 
 @ControllerAdvice//adds to all controllers
 public class ErrorHandler {
-    @ExceptionHandler()
+
+    @ExceptionHandler
     public ResponseEntity<ExceptionResponseModel> handleException(IllegalArgumentException e) {
         return getBadRequestExceptionResponseModelResponseEntity(HttpStatus.NOT_ACCEPTABLE, e.getMessage());
     }

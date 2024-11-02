@@ -26,6 +26,7 @@ public class ActorController {
     }
 
     @Transactional
+    // for swagger
     @Operation(summary = "Create a new actor",
             responses = {
                     @ApiResponse(responseCode = "201", description = "User  created successfully"),

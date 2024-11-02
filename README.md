@@ -28,7 +28,7 @@ to perform CRUD operations on movies, actors, and genres.
 - **Spring Data JPA**
 - **SQLite**: For persistent database storage.
 - **Lombok**: For reducing boilerplate code.
-- **Jakarta Servlet**:
+- **Jakarta Validation**
 
 ## Setup Instructions
 
@@ -63,7 +63,8 @@ For more documentation go to http://localhost:8080/swagger-ui/index.html
 
 For Postman is a ***Movie Database API.postman_collection.json*** file in resources folder.
 ***Import it after the program has started***
-For testing purpose the application creates admin and manager user and changes the Postman files tokens.
+For testing purpose is an admin user created and on the application startup logged in as admin to get the token and the
+Postman file tokens changed.
 
 When needed to add data run ***add_data.http***
 
