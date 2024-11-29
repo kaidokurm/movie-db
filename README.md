@@ -42,7 +42,7 @@ to perform CRUD operations on movies, actors, and genres.
 ### Clone the Repository
 
 ```bash
-git clone https://gitea.kood.tech/kaidokurm/kmdb.git
+git clone https://github.com/kaidokurm/movie-db.git
 cd kmdb
 ```
 
